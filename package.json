@@ -3,12 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node build/index.js",
+    "start": "node build/src/index.js",
     "predev": "npm run swagger",
     "prebuild": "npm run swagger",
     "build": "tsc",
     "dev": "concurrently \"nodemon\" \"nodemon -x tsoa spec\"",
-    "swagger": "tsoa spec"
+    "swagger": "tsoa spec",
+    "tsoa:gen": "tsoa routes && tsoa swagger"
   },
   "nodemonConfig": {
     "watch": [
@@ -31,6 +32,7 @@
     "typescript": "^4.4.3"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
     "@types/node": "^16.9.6",
     "@types/swagger-ui-express": "^4.1.3",

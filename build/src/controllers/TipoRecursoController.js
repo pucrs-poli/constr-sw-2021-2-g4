@@ -18,12 +18,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TipoRecursoController = void 0;
 const tsoa_1 = require("tsoa");
-let PingController = class PingController {
+let TipoRecursoController = class TipoRecursoController extends tsoa_1.Controller {
     getMessage() {
         return __awaiter(this, void 0, void 0, function* () {
             return {
-                message: "pong",
+                message: "tipo-de-recurso TODO",
             };
         });
     }
@@ -33,8 +34,9 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], PingController.prototype, "getMessage", null);
-PingController = __decorate([
-    (0, tsoa_1.Route)("ping")
-], PingController);
-exports.default = PingController;
+], TipoRecursoController.prototype, "getMessage", null);
+TipoRecursoController = __decorate([
+    (0, tsoa_1.Route)("tipoRecurso"),
+    (0, tsoa_1.Path)("recurso")
+], TipoRecursoController);
+exports.TipoRecursoController = TipoRecursoController;
