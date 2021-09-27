@@ -10,6 +10,7 @@ const swagger_1 = __importDefault(require("./middlewares/swagger"));
 const routes_1 = require("./routes/routes");
 const init = () => {
     const server = (0, express_1.default)();
+    require('dotenv').config();
     server.use((0, body_parser_1.json)());
     server.use((0, cors_1.default)());
     server.use(swagger_1.default);
@@ -20,7 +21,7 @@ const init = () => {
             docs: `Go to /doc to see the routes documentation.`,
         });
     });
-    const PORT = 8000;
+    const PORT = process.env.APPLICATION_PORT || "8080";
     server.listen(PORT, () => {
         console.log(`Server listening on port ${PORT}`);
     });
