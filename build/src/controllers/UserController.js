@@ -32,24 +32,33 @@ let UserController = class UserController extends tsoa_1.Controller {
     getAllUsers(request) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // keycloak.auth({
-                //     username, password
-                // })
-                console.log(config_1.keycloak.accessToken);
-                // if (!keycloak.accessToken) {
-                //     return response.status(400).json({
-                //         message: "test lol",
-                //     });
-                // }
-                const user = yield config_1.keycloak.users.find();
-                console.log(user);
                 return {
-                    message: `TEST`,
+                    message: yield config_1.keycloak.users.find(),
+                    success: true
                 };
             }
             catch (err) {
                 return {
-                    message: "TESTAAA",
+                    message: [],
+                    success: false
+                };
+            }
+        });
+    }
+    ;
+    getUserById(request, id, realm) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log(yield config_1.keycloak.users.findOne({ id, realm }));
+                return {
+                    message: yield config_1.keycloak.users.findOne({ id, realm }),
+                    success: true
+                };
+            }
+            catch (err) {
+                return {
+                    message: {},
+                    success: false
                 };
             }
         });
@@ -57,15 +66,25 @@ let UserController = class UserController extends tsoa_1.Controller {
     ;
 };
 __decorate([
-    (0, tsoa_1.Get)("/users"),
+    (0, tsoa_1.Get)("/"),
+    (0, tsoa_1.Security)("keycloakAuth"),
     __param(0, (0, tsoa_1.Request)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getAllUsers", null);
+__decorate([
+    (0, tsoa_1.Get)("/{realm}/{id}"),
+    (0, tsoa_1.Security)("keycloakAuth"),
+    __param(0, (0, tsoa_1.Request)()),
+    __param(1, (0, tsoa_1.Path)("id")),
+    __param(2, (0, tsoa_1.Path)("realm")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getUserById", null);
 UserController = __decorate([
-    (0, tsoa_1.Route)("user"),
-    (0, tsoa_1.Path)("user"),
+    (0, tsoa_1.Route)("users"),
     (0, tsoa_1.Tags)("UserController")
 ], UserController);
 exports.UserController = UserController;

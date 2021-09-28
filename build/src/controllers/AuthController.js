@@ -27,24 +27,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const tsoa_1 = require("tsoa");
 const express_1 = __importDefault(require("express"));
-const config_1 = require("../config/");
 let AuthController = class AuthController extends tsoa_1.Controller {
-    getAllUsers2(request, requestBody) {
+    getAllUsers(request, requestBody) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { username, password, grantType, clientId } = request.body;
-                console.log(config_1.keycloak.baseUrl);
-                console.log(config_1.keycloak.realmName);
-                yield config_1.keycloak.auth({
-                    username, password, grantType, clientId
-                });
-                return {
-                    message: `${config_1.keycloak.accessToken}`,
-                };
+                if (!request.user) {
+                    throw new Error("No user found");
+                }
+                const { refreshToken, accessToken } = request.user;
+                if (refreshToken && accessToken)
+                    return {
+                        message: `Successfully authenticated!`,
+                        refreshToken,
+                        accessToken
+                    };
+                else {
+                    throw new Error("No token found");
+                }
             }
             catch (err) {
                 return {
                     message: `${err.message}`,
+                    accessToken: '',
+                    refreshToken: ''
                 };
             }
         });
@@ -53,12 +58,13 @@ let AuthController = class AuthController extends tsoa_1.Controller {
 };
 __decorate([
     (0, tsoa_1.Post)("/auth"),
+    (0, tsoa_1.Security)("keycloakLogin"),
     __param(0, (0, tsoa_1.Request)()),
     __param(1, (0, tsoa_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
-], AuthController.prototype, "getAllUsers2", null);
+], AuthController.prototype, "getAllUsers", null);
 AuthController = __decorate([
     (0, tsoa_1.Route)("auth"),
     (0, tsoa_1.Path)("auth"),

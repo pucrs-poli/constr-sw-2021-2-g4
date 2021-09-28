@@ -5,7 +5,17 @@
     ],
     "spec": {
         "outputDirectory": "./dist/",
-        "basePath": "/api/v1"
+        "basePath": "/api/v1",
+        "securityDfinitions": {
+            "keycloakLogin": {
+                "type": "apiKey",
+                "name": "authorization"
+            },
+            "keycloakAuth": {
+                "type": "apiKey",
+                "name": "authorization"
+            }
+        }
     },
     "swagger": {
         "specVersion": 3,
@@ -16,6 +26,7 @@
         "outputDirectory": "./dist/",
         "basePath": "/api/v1",
         "entryFile": "./src/index.ts",
-        "routesDir": "./src/routes/"
+        "routesDir": "./src/routes/",
+        "authenticationModule": "./src/middlewares/authentication.ts"
     }
 }
