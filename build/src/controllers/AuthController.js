@@ -57,7 +57,7 @@ let AuthController = class AuthController extends tsoa_1.Controller {
     ;
 };
 __decorate([
-    (0, tsoa_1.Post)("/auth"),
+    (0, tsoa_1.Post)("/login"),
     (0, tsoa_1.Security)("keycloakLogin"),
     __param(0, (0, tsoa_1.Request)()),
     __param(1, (0, tsoa_1.Body)()),
