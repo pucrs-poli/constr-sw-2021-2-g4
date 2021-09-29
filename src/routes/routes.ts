@@ -171,7 +171,7 @@ export function RegisterRoutes(app: express.Router) {
         app.post('/api/v1/auth/login',
             authenticateMiddleware([{"keycloakLogin":[]}]),
 
-            function AuthController_getAllUsers(request: any, response: any, next: any) {
+            function AuthController_authenticate(request: any, response: any, next: any) {
             const args = {
                     request: {"in":"request","name":"request","required":true,"dataType":"object"},
                     requestBody: {"in":"body","name":"requestBody","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"clientId":{"dataType":"any","required":true},"grantType":{"dataType":"any","required":true},"password":{"dataType":"string","required":true},"username":{"dataType":"string","required":true}}},
@@ -189,7 +189,7 @@ export function RegisterRoutes(app: express.Router) {
             const controller = new AuthController();
 
 
-            const promise = controller.getAllUsers.apply(controller, validatedArgs as any);
+            const promise = controller.authenticate.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, undefined, next);
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

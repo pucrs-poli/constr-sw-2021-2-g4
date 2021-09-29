@@ -175,7 +175,7 @@ function RegisterRoutes(app) {
     //  NOTE: If you do not see routes for all of your controllers in this file, then you might not have informed tsoa of where to look
     //      Please look into the "controllerPathGlobs" config option described in the readme: https://github.com/lukeautry/tsoa
     // ###########################################################################################################
-    app.post('/api/v1/auth/login', authenticateMiddleware([{ "keycloakLogin": [] }]), function AuthController_getAllUsers(request, response, next) {
+    app.post('/api/v1/auth/login', authenticateMiddleware([{ "keycloakLogin": [] }]), function AuthController_authenticate(request, response, next) {
         const args = {
             request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
             requestBody: { "in": "body", "name": "requestBody", "required": true, "dataType": "nestedObjectLiteral", "nestedProperties": { "clientId": { "dataType": "any", "required": true }, "grantType": { "dataType": "any", "required": true }, "password": { "dataType": "string", "required": true }, "username": { "dataType": "string", "required": true } } },
@@ -189,7 +189,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
         const controller = new AuthController_1.AuthController();
-        const promise = controller.getAllUsers.apply(controller, validatedArgs);
+        const promise = controller.authenticate.apply(controller, validatedArgs);
         promiseHandler(controller, promise, response, undefined, next);
     });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

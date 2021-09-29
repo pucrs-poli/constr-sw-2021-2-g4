@@ -1,4 +1,4 @@
-import { Path, Route, Request, Controller, Tags, Body, Post, Security } from "tsoa";
+import { Path, Route, Request, Controller, Tags, Body, Post, Security, Get } from "tsoa";
 import express from "express";
 import { keycloak } from "../config/";
 
@@ -14,7 +14,7 @@ interface AuthResponse {
 export class AuthController extends Controller {
     @Post("/login")
     @Security("keycloakLogin")
-    public async getAllUsers(
+    public async authenticate(
         @Request() request: express.Request,
         @Body() requestBody: { username: string; password: string; grantType: any; clientId: any },
     ): Promise<AuthResponse> {
@@ -33,6 +33,22 @@ export class AuthController extends Controller {
             else {
                 throw new Error("No token found");
             }
+        } catch (err: any) {
+            return {
+                message: `${err.message}`,
+                accessToken: '',
+                refreshToken: ''
+            };
+        }
+    };
+    @Get("/login")
+    // @Security("keycloakLogin")
+    public async test(
+        @Request() request: express.Request,
+    ): Promise<AuthResponse> {
+        try {
+            console.log("aa")
+            return { message: 'y', accessToken: 'a', refreshToken: 'b' };
         } catch (err: any) {
             return {
                 message: `${err.message}`,

@@ -28,7 +28,7 @@ exports.AuthController = void 0;
 const tsoa_1 = require("tsoa");
 const express_1 = __importDefault(require("express"));
 let AuthController = class AuthController extends tsoa_1.Controller {
-    getAllUsers(request, requestBody) {
+    authenticate(request, requestBody) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 if (!request.user) {
@@ -64,7 +64,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
-], AuthController.prototype, "getAllUsers", null);
+], AuthController.prototype, "authenticate", null);
 AuthController = __decorate([
     (0, tsoa_1.Route)("auth"),
     (0, tsoa_1.Path)("auth"),
