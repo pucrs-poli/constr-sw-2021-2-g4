@@ -12,8 +12,9 @@ services:
     networks:
       - app-network
     command: bash -c "npm run tsoa:gen; npm run build; npm run start"
+    environment:
+      KEYCLOAK_HOST=keycloak
     env_file: ./.env
-    
   keycloak:
     image: jboss/keycloak:15.0.2
     container_name: keycloak
