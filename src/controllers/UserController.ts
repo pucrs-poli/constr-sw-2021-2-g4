@@ -30,6 +30,7 @@ export class UserController extends Controller {
                 success: true
             };
         } catch (err) {
+            console.log(err);
             return {
                 message: [],
                 success: false

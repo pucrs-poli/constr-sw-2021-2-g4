@@ -8,8 +8,10 @@ export async function expressAuthentication(
     scopes?: string[]
 ): Promise<any> {
     if (securityName === "keycloakLogin") {
+
         const { username, password, grantType, clientId } = request.body;
-        const result = await keycloak.auth({
+        console.log(request.body)
+        await keycloak.auth({
             username, password, grantType, clientId
         })
 

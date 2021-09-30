@@ -38,6 +38,7 @@ let UserController = class UserController extends tsoa_1.Controller {
                 };
             }
             catch (err) {
+                console.log(err);
                 return {
                     message: [],
                     success: false

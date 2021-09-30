@@ -15,7 +15,8 @@ function expressAuthentication(request, securityName, scopes) {
     return __awaiter(this, void 0, void 0, function* () {
         if (securityName === "keycloakLogin") {
             const { username, password, grantType, clientId } = request.body;
-            const result = yield config_1.keycloak.auth({
+            console.log(request.body);
+            yield config_1.keycloak.auth({
                 username, password, grantType, clientId
             });
             if (!config_1.keycloak.accessToken || !config_1.keycloak.refreshToken)
