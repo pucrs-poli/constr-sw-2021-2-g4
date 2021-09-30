@@ -1,9 +1,14 @@
-// import server from "./server";
+// import "reflect-metadata";
 
-// const PORT = process.env.APPLICATION_PORT
+// import connectDatabase from "./database";
+import server from "./server";
+server.init();
 
-// server.listen(PORT, () => {
-// })
-const appp = require('./server')
-const port = process.env.PORT
-appp.listen(port, () => { console.log(`listening on ${port}`) })
+// connectDatabase()
+//   .then(() => {
+//     console.log("Connected successfully to database.");
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//     console.log(`Error connecting to database!\n${err.message}`);
+//   });
