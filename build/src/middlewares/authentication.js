@@ -22,6 +22,7 @@ function expressAuthentication(request, securityName, scopes) {
             if (!config_1.keycloak.accessToken || !config_1.keycloak.refreshToken)
                 return Promise.reject(new Error("No token found."));
             const { refreshToken, accessToken } = config_1.keycloak;
+            // keycloak.
             return Promise.resolve({
                 refreshToken, accessToken
             });

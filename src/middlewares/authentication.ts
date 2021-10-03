@@ -19,6 +19,7 @@ export async function expressAuthentication(
             return Promise.reject(new Error("No token found."));
         const { refreshToken, accessToken } = keycloak
 
+        // keycloak.
         return Promise.resolve({
             refreshToken, accessToken
         });

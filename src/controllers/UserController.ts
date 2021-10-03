@@ -23,18 +23,18 @@ export class UserController extends Controller {
     @Security("keycloakAuth")
     public async getAllUsers(
         @Request() request: express.Request,
-    ): Promise<UserResponse> {
+    ): Promise<UserResponse | { message: string, status: boolean }> {
         try {
+
             return {
                 message: await keycloak.users.find(),
                 success: true
             };
-        } catch (err) {
-            console.log(err);
+        } catch (err: any) {
             return {
-                message: [],
+                message: `${err.message}`,
                 success: false
-            };
+            } as any;
         }
     };
 
@@ -44,15 +44,15 @@ export class UserController extends Controller {
         @Request() request: express.Request,
         @Path("id") id: string,
         @Path("realm") realm: string
-    ): Promise<UserByIdResponse> {
+    ): Promise<UserByIdResponse | { message: string; success: boolean }> {
         try {
             return {
                 message: await keycloak.users.findOne({ id, realm }),
                 success: true
             };
-        } catch (err) {
+        } catch (err: any) {
             return {
-                message: {},
+                message: `${err.message}`,
                 success: false
             };
         }
@@ -71,87 +71,86 @@ export class UserController extends Controller {
                 message: "New user created",
                 success: true
             };
-        } catch (err) {
+        } catch (err: any) {
             return {
-                message: "",
+                message: `${err.message}`,
                 success: false
             };
         }
     };
 
-    @Put("/{id}")
+    @Put("/{realm}/{id}")
     @Security("keycloakAuth")
     public async updateUser(
         @Request() request: express.Request,
-        @Body() body: { username: string, email: string, firstName: string, lastName: string, emailVerified: boolean, enabled: boolean },
-        @Path("id") id: string
+        @Body() body: { email?: string, firstName?: string, lastName?: string, emailVerified?: boolean, enabled?: boolean },
+        @Path("id") id: string,
+        @Path("realm") realm: string
     ): Promise<UserCreationResponse> {
         try {
-            const updateUser: any = { username: "", email: "", firstName: "", lastName: "", emailVerified: "", enabled: false }
-            const allKeys = Object.keys(updateUser)
-            allKeys.forEach(key => {
-                if (request.body[key])
-                    updateUser[key] = request.body[key]
-                else
-                    delete updateUser[key];
-            })
-
-            await keycloak.users.update({ id }, updateUser)
+            const user = keycloak.users.findOne({ id, realm })
+            if (!user) {
+                throw new Error("No user found");
+            }
+            await keycloak.users.update({ id, realm }, request.body)
             return {
                 message: "Updated user",
                 success: true
             };
         }
-        catch (err) {
+        catch (err: any) {
             return {
-                message: "",
+                message: `${err.message}`,
                 success: false
             };
         }
     };
 
-    @Delete("/{id}")
+    @Delete("/{realm}/{id}")
     @Security("keycloakAuth")
     public async deleteUser(
         @Request() request: express.Request,
-        @Path("id") id: string
+        @Path("id") id: string,
+        @Path("realm") realm: string
     ): Promise<UserCreationResponse> {
         try {
-            await keycloak.users.update({ id }, { enabled: false })
+            await keycloak.users.update({ id, realm }, { enabled: false })
             return {
                 message: "Updated user",
                 success: true
             };
         }
-        catch (err) {
+        catch (err: any) {
             return {
-                message: "",
+                message: `${err.message}`,
                 success: false
             };
         }
     };
 
-    @Patch("/{id}")
+    @Patch("/{realm}/{id}")
     @Security("keycloakAuth")
     public async updatePassword(
         @Request() request: express.Request,
         @Body() body: { password: string },
-        @Path("id") id: string
+        @Path("id") id: string,
+        @Path("realm") realm: string,
     ): Promise<UserCreationResponse> {
         try {
             const { password } = request.body;
-            const credentials: UserRepresentation = {}
-            credentials.credentials![0].type = "password";
-            credentials.credentials![0].value = password;
-            await keycloak.users.update({ id }, credentials)
+            const cred_list: { type: string, value: string }[] = [{ type: "password", value: password }]
+            const credentials: UserRepresentation = {
+                credentials: cred_list
+            }
+            await keycloak.users.update({ id, realm }, credentials)
             return {
                 message: "Updated user password",
                 success: true
             };
         }
-        catch (err) {
+        catch (err: any) {
             return {
-                message: "",
+                message: `${err.message}`,
                 success: false
             };
         }

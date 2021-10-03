@@ -41,20 +41,5 @@ export class AuthController extends Controller {
             };
         }
     };
-    @Get("/login")
-    // @Security("keycloakLogin")
-    public async test(
-        @Request() request: express.Request,
-    ): Promise<AuthResponse> {
-        try {
-            console.log("aa")
-            return { message: 'y', accessToken: 'a', refreshToken: 'b' };
-        } catch (err: any) {
-            return {
-                message: `${err.message}`,
-                accessToken: '',
-                refreshToken: ''
-            };
-        }
-    };
+
 }

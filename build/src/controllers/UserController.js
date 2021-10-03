@@ -32,6 +32,7 @@ let UserController = class UserController extends tsoa_1.Controller {
     getAllUsers(request) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                console.log(config_1.keycloak.accessToken);
                 return {
                     message: yield config_1.keycloak.users.find(),
                     success: true
@@ -57,7 +58,7 @@ let UserController = class UserController extends tsoa_1.Controller {
             }
             catch (err) {
                 return {
-                    message: {},
+                    message: `${err.message}`,
                     success: false
                 };
             }
@@ -76,25 +77,21 @@ let UserController = class UserController extends tsoa_1.Controller {
             }
             catch (err) {
                 return {
-                    message: "",
+                    message: `${err.message}`,
                     success: false
                 };
             }
         });
     }
     ;
-    updateUser(request, body, id) {
+    updateUser(request, body, id, realm) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const updateUser = { username: "", email: "", firstName: "", lastName: "", emailVerified: "", enabled: false };
-                const allKeys = Object.keys(updateUser);
-                allKeys.forEach(key => {
-                    if (request.body[key])
-                        updateUser[key] = request.body[key];
-                    else
-                        delete updateUser[key];
-                });
-                yield config_1.keycloak.users.update({ id }, updateUser);
+                const user = config_1.keycloak.users.findOne({ id, realm });
+                if (!user) {
+                    throw new Error("No user found");
+                }
+                yield config_1.keycloak.users.update({ id, realm }, request.body);
                 return {
                     message: "Updated user",
                     success: true
@@ -102,17 +99,17 @@ let UserController = class UserController extends tsoa_1.Controller {
             }
             catch (err) {
                 return {
-                    message: "",
+                    message: `${err.message}`,
                     success: false
                 };
             }
         });
     }
     ;
-    deleteUser(request, id) {
+    deleteUser(request, id, realm) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield config_1.keycloak.users.update({ id }, { enabled: false });
+                yield config_1.keycloak.users.update({ id, realm }, { enabled: false });
                 return {
                     message: "Updated user",
                     success: true
@@ -120,21 +117,22 @@ let UserController = class UserController extends tsoa_1.Controller {
             }
             catch (err) {
                 return {
-                    message: "",
+                    message: `${err.message}`,
                     success: false
                 };
             }
         });
     }
     ;
-    updatePassword(request, body, id) {
+    updatePassword(request, body, id, realm) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { password } = request.body;
-                const credentials = {};
-                credentials.credentials[0].type = "password";
-                credentials.credentials[0].value = password;
-                yield config_1.keycloak.users.update({ id }, credentials);
+                const cred_list = [{ type: "password", value: password }];
+                const credentials = {
+                    credentials: cred_list
+                };
+                yield config_1.keycloak.users.update({ id, realm }, credentials);
                 return {
                     message: "Updated user password",
                     success: true
@@ -142,7 +140,7 @@ let UserController = class UserController extends tsoa_1.Controller {
             }
             catch (err) {
                 return {
-                    message: "",
+                    message: `${err.message}`,
                     success: false
                 };
             }
@@ -178,32 +176,35 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "createUser", null);
 __decorate([
-    (0, tsoa_1.Put)("/{id}"),
+    (0, tsoa_1.Put)("/{realm}/{id}"),
     (0, tsoa_1.Security)("keycloakAuth"),
     __param(0, (0, tsoa_1.Request)()),
     __param(1, (0, tsoa_1.Body)()),
     __param(2, (0, tsoa_1.Path)("id")),
+    __param(3, (0, tsoa_1.Path)("realm")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, String]),
+    __metadata("design:paramtypes", [Object, Object, String, String]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "updateUser", null);
 __decorate([
-    (0, tsoa_1.Delete)("/{id}"),
+    (0, tsoa_1.Delete)("/{realm}/{id}"),
     (0, tsoa_1.Security)("keycloakAuth"),
     __param(0, (0, tsoa_1.Request)()),
     __param(1, (0, tsoa_1.Path)("id")),
+    __param(2, (0, tsoa_1.Path)("realm")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:paramtypes", [Object, String, String]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "deleteUser", null);
 __decorate([
-    (0, tsoa_1.Patch)("/{id}"),
+    (0, tsoa_1.Patch)("/{realm}/{id}"),
     (0, tsoa_1.Security)("keycloakAuth"),
     __param(0, (0, tsoa_1.Request)()),
     __param(1, (0, tsoa_1.Body)()),
     __param(2, (0, tsoa_1.Path)("id")),
+    __param(3, (0, tsoa_1.Path)("realm")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, String]),
+    __metadata("design:paramtypes", [Object, Object, String, String]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "updatePassword", null);
 UserController = __decorate([

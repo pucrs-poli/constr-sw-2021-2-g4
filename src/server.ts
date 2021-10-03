@@ -19,7 +19,7 @@ const init = () => {
     server.get("/", (_, res: express.Response) => {
         res.send({
             status: "Api is running",
-            docs: `Go to /doc to see the routes documentation.`,
+            message: `Go to /doc to see the routes documentation.`,
         });
     });
 
