@@ -280,7 +280,7 @@ function RegisterRoutes(app) {
     app.post('/api/v1/users', authenticateMiddleware([{ "keycloakAuth": [] }]), function UserController_createUser(request, response, next) {
         const args = {
             request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
-            body: { "in": "body", "name": "body", "required": true, "dataType": "nestedObjectLiteral", "nestedProperties": { "enabled": { "dataType": "boolean", "required": true }, "emailVerified": { "dataType": "boolean", "required": true }, "lastName": { "dataType": "string", "required": true }, "firstName": { "dataType": "string", "required": true }, "email": { "dataType": "string", "required": true }, "username": { "dataType": "string", "required": true } } },
+            body: { "in": "body", "name": "body", "required": true, "dataType": "nestedObjectLiteral", "nestedProperties": { "password": { "dataType": "string", "required": true }, "enabled": { "dataType": "boolean", "required": true }, "emailVerified": { "dataType": "boolean", "required": true }, "lastName": { "dataType": "string", "required": true }, "firstName": { "dataType": "string", "required": true }, "email": { "dataType": "string", "required": true }, "username": { "dataType": "string", "required": true } } },
         };
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         let validatedArgs = [];

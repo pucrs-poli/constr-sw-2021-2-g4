@@ -28,20 +28,19 @@ exports.UserController = void 0;
 const tsoa_1 = require("tsoa");
 const express_1 = __importDefault(require("express"));
 const config_1 = require("../config/");
+const UserModel_1 = __importDefault(require("../models/UserModel"));
 let UserController = class UserController extends tsoa_1.Controller {
     getAllUsers(request) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log(config_1.keycloak.accessToken);
                 return {
                     message: yield config_1.keycloak.users.find(),
                     success: true
                 };
             }
             catch (err) {
-                console.log(err);
                 return {
-                    message: [],
+                    message: `${err.message}`,
                     success: false
                 };
             }
@@ -68,8 +67,10 @@ let UserController = class UserController extends tsoa_1.Controller {
     createUser(request, body) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { username, email, firstName, lastName, emailVerified, enabled } = request.body;
-                yield config_1.keycloak.users.create({ username, email, firstName, lastName, emailVerified, enabled });
+                const { username, email, firstName, lastName, emailVerified, enabled, password } = request.body;
+                // await keycloak.users.create({ username, email, firstName, lastName, emailVerified, enabled })
+                yield UserModel_1.default.create({ username, email, firstName, lastName, emailVerified, enabled, password });
+                console.log(UserModel_1.default.find({}));
                 return {
                     message: "New user created",
                     success: true

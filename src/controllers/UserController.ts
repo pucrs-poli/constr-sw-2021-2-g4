@@ -3,7 +3,7 @@ import express from "express";
 import { keycloak } from "../config/";
 import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation";
 import { ExpressionWithTypeArguments } from "typescript";
-
+import UserModel from "../models/UserModel";
 interface UserResponse {
     message: UserRepresentation[];
     success: boolean
@@ -62,11 +62,13 @@ export class UserController extends Controller {
     @Security("keycloakAuth")
     public async createUser(
         @Request() request: express.Request,
-        @Body() body: { username: string, email: string, firstName: string, lastName: string, emailVerified: boolean, enabled: boolean }
+        @Body() body: { username: string, email: string, firstName: string, lastName: string, emailVerified: boolean, enabled: boolean, password: string }
     ): Promise<UserCreationResponse> {
         try {
-            const { username, email, firstName, lastName, emailVerified, enabled } = request.body
-            await keycloak.users.create({ username, email, firstName, lastName, emailVerified, enabled })
+            const { username, email, firstName, lastName, emailVerified, enabled, password } = request.body
+            // await keycloak.users.create({ username, email, firstName, lastName, emailVerified, enabled })
+            await UserModel.create({ username, email, firstName, lastName, emailVerified, enabled, password });
+            console.log(UserModel.find({}));
             return {
                 message: "New user created",
                 success: true
