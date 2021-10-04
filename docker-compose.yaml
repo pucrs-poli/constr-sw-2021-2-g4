@@ -1,0 +1,34 @@
+version: '3.3' # version of docker-composeservices: # defining service/s
+services:
+  node-api: # name of the service
+    build: .  # directory what to build, here it is root directory
+    image: nodejs
+    container_name : api
+    restart: always
+    ports:
+      - "${APPLICATION_PORT}:${APPLICATION_PORT}" # defining port for our app
+    depends_on:
+      - keycloak
+    networks:
+      - app-network
+    command: bash -c "npm run tsoa:gen; npm run build; npm run start"
+    environment:
+      KEYCLOAK_HOST: keycloak
+    env_file: ./.env
+  keycloak:
+    image: jboss/keycloak:15.0.2
+    container_name: keycloak
+    ports:
+      - "${KEYCLOAK_PORT}:${KEYCLOAK_PORT}"
+    expose:
+      - ${KEYCLOAK_PORT}
+    environment:
+      KEYCLOAK_PASSWORD: admin
+      KEYCLOAK_USER: admin
+      DB_VENDOR: h2
+    env_file: ./.env
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
