@@ -66,9 +66,7 @@ export class UserController extends Controller {
     ): Promise<UserCreationResponse> {
         try {
             const { username, email, firstName, lastName, emailVerified, enabled, password } = request.body
-            // await keycloak.users.create({ username, email, firstName, lastName, emailVerified, enabled })
-            await UserModel.create({ username, email, firstName, lastName, emailVerified, enabled, password });
-            console.log(UserModel.find({}));
+            await keycloak.users.create({ username, email, firstName, lastName, emailVerified, enabled })
             return {
                 message: "New user created",
                 success: true

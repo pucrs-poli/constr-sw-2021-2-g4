@@ -1,6 +1,5 @@
 import { Path, Route, Request, Controller, Tags, Body, Post, Security, Get } from "tsoa";
 import express from "express";
-import { keycloak } from "../config/";
 
 interface AuthResponse {
     message: string;

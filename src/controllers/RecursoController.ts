@@ -15,7 +15,6 @@ export class RecursoController extends Controller {
             message: "recurso TODO",
         };
     }
-
     @Get("/{id}")
     public async getRecurso(
         @Request() request: express.Request,
