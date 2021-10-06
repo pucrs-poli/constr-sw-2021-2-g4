@@ -19,6 +19,9 @@ interface UserCreationResponse {
 @Route("users")
 @Tags("UserController")
 export class UserController extends Controller {
+    /**
+     * This endpoint is used to  
+     */
     @Get("/")
     @Security("keycloakAuth")
     public async getAllUsers(
@@ -66,9 +69,7 @@ export class UserController extends Controller {
     ): Promise<UserCreationResponse> {
         try {
             const { username, email, firstName, lastName, emailVerified, enabled, password } = request.body
-            // await keycloak.users.create({ username, email, firstName, lastName, emailVerified, enabled })
-            await UserModel.create({ username, email, firstName, lastName, emailVerified, enabled, password });
-            console.log(UserModel.find({}));
+            await keycloak.users.create({ username, email, firstName, lastName, emailVerified, enabled })
             return {
                 message: "New user created",
                 success: true

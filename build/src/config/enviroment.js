@@ -19,7 +19,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose = __importStar(require("mongoose"));
-require('dotenv').config();
-mongoose.connect(`mongodb://${process.env.MONGODB_HOST}:${process.env.MONGODB_PORT}/${process.env.MONGODB_DATABASE}`);
-exports.default = mongoose;
+exports.ENVIROMENT_VARIABLES = void 0;
+const dotenv = __importStar(require("dotenv"));
+dotenv.config();
+exports.ENVIROMENT_VARIABLES = {
+    APPLICATION: {
+        PORT: process.env.APPLICATION_PORT,
+    },
+    KEYCLOAK: {
+        HOST: process.env.KEYCLOAK_HOST,
+        STANDARD_REALM: process.env.KEYCLOACK_STANDARD_REALM,
+        PORT: process.env.KEYCLOAK_PORT
+    }
+};

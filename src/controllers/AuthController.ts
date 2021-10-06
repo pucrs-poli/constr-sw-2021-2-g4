@@ -1,6 +1,5 @@
-import { Path, Route, Request, Controller, Tags, Body, Post, Security, Get } from "tsoa";
+import { Path, Route, Request, Controller, Tags, Body, Post, Security, Get, Example } from "tsoa";
 import express from "express";
-import { keycloak } from "../config/";
 
 interface AuthResponse {
     message: string;
@@ -12,6 +11,17 @@ interface AuthResponse {
 @Path("auth")
 @Tags("AuthController")
 export class AuthController extends Controller {
+
+    /**
+     * @param requestBody Description for the request body object
+     * @example requestBody {
+     *   "username": "JohnnyBravo",
+     *   "password": "my-secret",
+     *   "grantType": "password",
+     *   "clientId": "admin-cli"
+     * }
+     * just testing
+     */
     @Post("/login")
     @Security("keycloakLogin")
     public async authenticate(

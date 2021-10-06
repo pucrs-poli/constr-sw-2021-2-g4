@@ -1,9 +1,8 @@
 import KcAdminClient from "@keycloak/keycloak-admin-client";
-
-require('dotenv').config()
+import { ENVIROMENT_VARIABLES } from './enviroment';
 
 export const keycloak = new KcAdminClient({
-    baseUrl: `http://${process.env.KEYCLOAK_HOST}:${process.env.KEYCLOAK_PORT}/auth`,
-    realmName: `${process.env.KEYCLOACK_STANDARD_REALM}`
+    baseUrl: `http://${ENVIROMENT_VARIABLES.KEYCLOAK.HOST}:${ENVIROMENT_VARIABLES.KEYCLOAK.PORT}/auth`,
+    realmName: `${ENVIROMENT_VARIABLES.KEYCLOAK.STANDARD_REALM}`
 
 });

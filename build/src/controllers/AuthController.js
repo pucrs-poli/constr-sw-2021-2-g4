@@ -28,6 +28,16 @@ exports.AuthController = void 0;
 const tsoa_1 = require("tsoa");
 const express_1 = __importDefault(require("express"));
 let AuthController = class AuthController extends tsoa_1.Controller {
+    /**
+     * @param requestBody Description for the request body object
+     * @example requestBody {
+     *   "username": "JohnnyBravo",
+     *   "password": "my-secret",
+     *   "grantType": "password",
+     *   "clientId": "admin-cli"
+     * }
+     *
+     */
     authenticate(request, requestBody) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
