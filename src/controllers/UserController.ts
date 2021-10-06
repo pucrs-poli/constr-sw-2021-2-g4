@@ -19,6 +19,9 @@ interface UserCreationResponse {
 @Route("users")
 @Tags("UserController")
 export class UserController extends Controller {
+    /**
+     * This endpoint is used to  
+     */
     @Get("/")
     @Security("keycloakAuth")
     public async getAllUsers(
