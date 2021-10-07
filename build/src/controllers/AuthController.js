@@ -29,7 +29,7 @@ const tsoa_1 = require("tsoa");
 const express_1 = __importDefault(require("express"));
 let AuthController = class AuthController extends tsoa_1.Controller {
     /**
-     *
+     * @summary Authenticate user in API
      * @param requestBody Required fields to authenticate
      *
      */

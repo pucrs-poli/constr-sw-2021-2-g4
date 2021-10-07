@@ -30,8 +30,12 @@ const express_1 = __importDefault(require("express"));
 const config_1 = require("../config/");
 let UserController = class UserController extends tsoa_1.Controller {
     /**
+<<<<<<< HEAD
      * @summary Retrieve all users in Keycloak Master Realm
      *
+=======
+     * This endpoint is used to
+>>>>>>> e6b1a006268804491bf98b9a8fe7a2a11abe3641
      */
     getAllUsers(request) {
         return __awaiter(this, void 0, void 0, function* () {

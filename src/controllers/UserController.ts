@@ -1,9 +1,7 @@
-import { Get, Path, Route, Request, Controller, Tags, Security, Header, Query, Post, Body, Put, Delete, Patch } from "tsoa";
+import { Get, Path, Route, Request, Controller, Tags, Security, Post, Body, Put, Delete, Patch } from "tsoa";
 import express from "express";
 import { keycloak } from "../config/";
 import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation";
-import { ExpressionWithTypeArguments } from "typescript";
-import { UserModel } from "../models/UserModel";
 interface UserResponse {
     message: UserRepresentation[];
     success: boolean
