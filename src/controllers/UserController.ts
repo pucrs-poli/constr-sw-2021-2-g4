@@ -3,7 +3,7 @@ import express from "express";
 import { keycloak } from "../config/";
 import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation";
 import { ExpressionWithTypeArguments } from "typescript";
-import UserModel from "../models/UserModel";
+import { UserModel } from "../models/UserModel";
 interface UserResponse {
     message: UserRepresentation[];
     success: boolean
@@ -16,9 +16,36 @@ interface UserCreationResponse {
     message: string;
     success: boolean
 }
+
+interface CreateUserInterface {
+    username: string,
+    firstName: string,
+    lastName: string,
+    password: string,
+    email: string,
+    enabled: boolean,
+    emailVerified: boolean
+}
+interface UpdateUserInterface {
+    username?: string,
+    firstName?: string,
+    lastName?: string,
+    password?: string,
+    email?: string,
+    enabled?: boolean,
+    emailVerified?: boolean
+}
+interface UpdatePasswordInterface {
+    password: string
+}
+
 @Route("users")
 @Tags("UserController")
 export class UserController extends Controller {
+    /**
+     * @summary Retrieve all users in Keycloak Master Realm
+     * 
+     */
     @Get("/")
     @Security("keycloakAuth")
     public async getAllUsers(
@@ -38,6 +65,13 @@ export class UserController extends Controller {
         }
     };
 
+    /**
+     * @summary Get specific user in specific realm
+     * 
+     * @param realm Define the realm
+     * @param id Define user ID to be fetched
+     * 
+    */
     @Get("/{realm}/{id}")
     @Security("keycloakAuth")
     public async getUserById(
@@ -58,14 +92,19 @@ export class UserController extends Controller {
         }
     };
 
+    /**
+     * @summary Create user in Keycloak
+     * 
+     * 
+     */
     @Post("/")
     @Security("keycloakAuth")
     public async createUser(
         @Request() request: express.Request,
-        @Body() body: { username: string, email: string, firstName: string, lastName: string, emailVerified: boolean, enabled: boolean, password: string }
+        @Body() requestBody: CreateUserInterface
     ): Promise<UserCreationResponse> {
         try {
-            const { username, email, firstName, lastName, emailVerified, enabled, password } = request.body
+            const { username, email, firstName, lastName, emailVerified, enabled } = request.body
             await keycloak.users.create({ username, email, firstName, lastName, emailVerified, enabled })
             return {
                 message: "New user created",
@@ -79,11 +118,19 @@ export class UserController extends Controller {
         }
     };
 
+    /**
+     * @summary  Update user field
+     * 
+     * @param body Send fields to be updated
+     * @param id define user ID 
+     * @param realm define user realm
+     * 
+     */
     @Put("/{realm}/{id}")
     @Security("keycloakAuth")
     public async updateUser(
         @Request() request: express.Request,
-        @Body() body: { email?: string, firstName?: string, lastName?: string, emailVerified?: boolean, enabled?: boolean },
+        @Body() body: UpdateUserInterface,
         @Path("id") id: string,
         @Path("realm") realm: string
     ): Promise<UserCreationResponse> {
@@ -106,6 +153,11 @@ export class UserController extends Controller {
         }
     };
 
+    /**
+     * @summary Delete user in Keycloak
+     * @param id Define user ID
+     * @param realm Define user Realm
+     */
     @Delete("/{realm}/{id}")
     @Security("keycloakAuth")
     public async deleteUser(
@@ -128,11 +180,20 @@ export class UserController extends Controller {
         }
     };
 
+    /**
+     * 
+     * @summary Update user Password
+     * 
+     * @param body Define new password
+     * @param id Define User ID
+     * @param realm Define User Realm
+     * 
+     */
     @Patch("/{realm}/{id}")
     @Security("keycloakAuth")
     public async updatePassword(
         @Request() request: express.Request,
-        @Body() body: { password: string },
+        @Body() body: UpdatePasswordInterface,
         @Path("id") id: string,
         @Path("realm") realm: string,
     ): Promise<UserCreationResponse> {

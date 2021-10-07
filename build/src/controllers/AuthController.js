@@ -28,6 +28,11 @@ exports.AuthController = void 0;
 const tsoa_1 = require("tsoa");
 const express_1 = __importDefault(require("express"));
 let AuthController = class AuthController extends tsoa_1.Controller {
+    /**
+     *
+     * @param requestBody Required fields to authenticate
+     *
+     */
     authenticate(request, requestBody) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

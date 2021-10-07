@@ -1,5 +1,7 @@
 import { Schema, model } from "mongoose";
 
+
+
 const UserSchema = new Schema(
     {
         username: {
@@ -25,8 +27,15 @@ const UserSchema = new Schema(
         enabled: {
             type: Boolean,
             required: true
+        },
+        emailVerified: {
+            type: Boolean,
+            required: true
         }
     }
 )
+
 const UserModel = model("User", UserSchema);
-export default UserModel;
+export {
+    UserModel
+}

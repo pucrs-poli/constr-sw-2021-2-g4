@@ -1,4 +1,4 @@
-import { Path, Route, Request, Controller, Tags, Body, Post, Security, Get } from "tsoa";
+import { Path, Route, Request, Controller, Tags, Body, Post, Security, Get, Example } from "tsoa";
 import express from "express";
 
 interface AuthResponse {
@@ -6,16 +6,25 @@ interface AuthResponse {
     accessToken: string;
     refreshToken: string;
 }
+interface AuthParams {
+    username: string; password: string; grantType: string; clientId: string
+}
 
 @Route("auth")
 @Path("auth")
 @Tags("AuthController")
 export class AuthController extends Controller {
+
+    /**
+     * @summary Authenticate user in API
+     * @param requestBody Required fields to authenticate
+     *
+     */
     @Post("/login")
     @Security("keycloakLogin")
     public async authenticate(
         @Request() request: express.Request,
-        @Body() requestBody: { username: string; password: string; grantType: any; clientId: any },
+        @Body() requestBody: AuthParams,
     ): Promise<AuthResponse> {
         try {
             if (!request.user) {
