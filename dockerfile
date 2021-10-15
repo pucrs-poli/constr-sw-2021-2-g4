@@ -1,18 +1,18 @@
-FROM node:14.16.1-alpine3.10 AS base
-WORKDIR /app
+FROM node AS base
 COPY package*.json /app/
 
+RUN mkdir -p /app
+WORKDIR /app
+COPY . /app
+
+# VOLUME . /home/node/app
+
 RUN npm install
-COPY . .
+
+RUN npm run tsoa:gen; 
+RUN npm run build;
+RUN echo 'npm run start' > entrypoint.sh
 
 EXPOSE 5000
 
-RUN apk update && apk add bash
-
-RUN npm run tsoa:gen; 
-RUN npm run build; \
-    npm run start > entrypoint.sh
-
-ENTRYPOINT [ "executable" ]
-
-# CMD [ "/bin/sh", "entrypoint.sh" ]/
+CMD [ "/bin/sh", "entrypoint.sh" ]
