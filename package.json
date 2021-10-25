@@ -11,7 +11,8 @@
     "swagger": "tsoa spec",
     "tsoa:gen": "tsoa routes && tsoa swagger",
     "test": "mocha",
-    "test-dev": "nodemon --watch . --ext ts --exec \"mocha -r ts-node/register test/**/*.test.ts\""
+    "test-dev": "nodemon --watch . --ext ts --exec \"mocha -r ts-node/register test/**/*.test.ts\"",
+    "startup": "npm run tsoa:gen;npm run build; npm run start"
   },
   "nodemonConfig": {
     "watch": [
