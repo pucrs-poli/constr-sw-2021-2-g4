@@ -1,9 +1,18 @@
-FROM node:14.16.1-alpine3.10 AS base
-WORKDIR /app
+FROM node AS base
 COPY package*.json /app/
+
+RUN mkdir -p /app
+WORKDIR /app
+COPY . /app
+
+# VOLUME . /home/node/app
+
 RUN npm install
-COPY . .
 
-RUN apk update && apk add bash
+RUN npm run tsoa:gen; 
+RUN npm run build;
+RUN echo 'npm run start' > entrypoint.sh
 
-# RUN wget https://github.com/vishnubob/wait-for-it/raw/master/wait-for-it.sh -O wait-for-it.sh && chmod +x wait-for-it.sh
+EXPOSE 5000
+
+CMD [ "/bin/sh", "entrypoint.sh" ]
