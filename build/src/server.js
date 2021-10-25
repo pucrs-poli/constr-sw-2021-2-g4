@@ -11,6 +11,11 @@ const routes_1 = require("./routes/routes");
 const server = (0, express_1.default)();
 server.use((0, body_parser_1.json)());
 server.use((0, cors_1.default)());
+// server.use(function (req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//     next();
+// });
 server.use(swagger_1.default);
 (0, routes_1.RegisterRoutes)(server);
 server.get("/", (_, res) => {
