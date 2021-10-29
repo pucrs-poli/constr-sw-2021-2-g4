@@ -29,13 +29,8 @@ const tsoa_1 = require("tsoa");
 const express_1 = __importDefault(require("express"));
 let AuthController = class AuthController extends tsoa_1.Controller {
     /**
-     * @param requestBody Description for the request body object
-     * @example requestBody {
-     *   "username": "JohnnyBravo",
-     *   "password": "my-secret",
-     *   "grantType": "password",
-     *   "clientId": "admin-cli"
-     * }
+     * @summary Authenticate user in API
+     * @param requestBody Required fields to authenticate
      *
      */
     authenticate(request, requestBody) {

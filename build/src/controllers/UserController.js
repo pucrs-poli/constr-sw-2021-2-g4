@@ -30,7 +30,8 @@ const express_1 = __importDefault(require("express"));
 const config_1 = require("../config/");
 let UserController = class UserController extends tsoa_1.Controller {
     /**
-     * This endpoint is used to
+     * @summary Retrieve all users in Keycloak Master Realm
+     *
      */
     getAllUsers(request) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -49,6 +50,13 @@ let UserController = class UserController extends tsoa_1.Controller {
         });
     }
     ;
+    /**
+     * @summary Get specific user in specific realm
+     *
+     * @param realm Define the realm
+     * @param id Define user ID to be fetched
+     *
+    */
     getUserById(request, id, realm) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -66,10 +74,15 @@ let UserController = class UserController extends tsoa_1.Controller {
         });
     }
     ;
-    createUser(request, body) {
+    /**
+     * @summary Create user in Keycloak
+     *
+     *
+     */
+    createUser(request, requestBody) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { username, email, firstName, lastName, emailVerified, enabled, password } = request.body;
+                const { username, email, firstName, lastName, emailVerified, enabled } = request.body;
                 yield config_1.keycloak.users.create({ username, email, firstName, lastName, emailVerified, enabled });
                 return {
                     message: "New user created",
@@ -85,6 +98,14 @@ let UserController = class UserController extends tsoa_1.Controller {
         });
     }
     ;
+    /**
+     * @summary  Update user field
+     *
+     * @param body Send fields to be updated
+     * @param id define user ID
+     * @param realm define user realm
+     *
+     */
     updateUser(request, body, id, realm) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -107,6 +128,11 @@ let UserController = class UserController extends tsoa_1.Controller {
         });
     }
     ;
+    /**
+     * @summary Delete user in Keycloak
+     * @param id Define user ID
+     * @param realm Define user Realm
+     */
     deleteUser(request, id, realm) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -125,6 +151,15 @@ let UserController = class UserController extends tsoa_1.Controller {
         });
     }
     ;
+    /**
+     *
+     * @summary Update user Password
+     *
+     * @param body Define new password
+     * @param id Define User ID
+     * @param realm Define User Realm
+     *
+     */
     updatePassword(request, body, id, realm) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

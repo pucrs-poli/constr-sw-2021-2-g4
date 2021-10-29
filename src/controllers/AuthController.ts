@@ -6,6 +6,9 @@ interface AuthResponse {
     accessToken: string;
     refreshToken: string;
 }
+interface AuthParams {
+    username: string; password: string; grantType: string; clientId: string
+}
 
 @Route("auth")
 @Path("auth")
@@ -13,20 +16,15 @@ interface AuthResponse {
 export class AuthController extends Controller {
 
     /**
-     * @param requestBody Description for the request body object
-     * @example requestBody {
-     *   "username": "JohnnyBravo",
-     *   "password": "my-secret",
-     *   "grantType": "password",
-     *   "clientId": "admin-cli"
-     * }
-     * just testing
+     * @summary Authenticate user in API
+     * @param requestBody Required fields to authenticate
+     *
      */
     @Post("/login")
     @Security("keycloakLogin")
     public async authenticate(
         @Request() request: express.Request,
-        @Body() requestBody: { username: string; password: string; grantType: any; clientId: any },
+        @Body() requestBody: AuthParams,
     ): Promise<AuthResponse> {
         try {
             if (!request.user) {
