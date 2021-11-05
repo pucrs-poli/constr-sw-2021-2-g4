@@ -47,6 +47,16 @@ const models: TsoaRoute.Models = {
         "additionalProperties": true,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CreateResourceInterface": {
+        "dataType": "refObject",
+        "properties": {
+            "name": {"dataType":"string","required":true},
+            "used": {"dataType":"boolean","required":true},
+            "description": {"dataType":"string","required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "TipoRecursoResponse": {
         "dataType": "refObject",
         "properties": {
@@ -242,7 +252,7 @@ export function RegisterRoutes(app: express.Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/recurso',
 
-            function RecursoController_getMessage(request: any, response: any, next: any) {
+            function RecursoController_getRecurso(request: any, response: any, next: any) {
             const args = {
             };
 
@@ -258,13 +268,13 @@ export function RegisterRoutes(app: express.Router) {
             const controller = new RecursoController();
 
 
-            const promise = controller.getMessage.apply(controller, validatedArgs as any);
+            const promise = controller.getRecurso.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, undefined, next);
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/recurso/:id',
 
-            function RecursoController_getRecurso(request: any, response: any, next: any) {
+            function RecursoController_getRecursoByID(request: any, response: any, next: any) {
             const args = {
                     request: {"in":"request","name":"request","required":true,"dataType":"object"},
                     id: {"in":"path","name":"id","required":true,"dataType":"string"},
@@ -282,7 +292,55 @@ export function RegisterRoutes(app: express.Router) {
             const controller = new RecursoController();
 
 
-            const promise = controller.getRecurso.apply(controller, validatedArgs as any);
+            const promise = controller.getRecursoByID.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, undefined, next);
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v1/recurso',
+
+            function RecursoController_createUser(request: any, response: any, next: any) {
+            const args = {
+                    request: {"in":"request","name":"request","required":true,"dataType":"object"},
+                    requestBody: {"in":"body","name":"requestBody","required":true,"ref":"CreateResourceInterface"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = new RecursoController();
+
+
+            const promise = controller.createUser.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, undefined, next);
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.delete('/api/v1/recurso/:id',
+
+            function RecursoController_removeRecursoByID(request: any, response: any, next: any) {
+            const args = {
+                    request: {"in":"request","name":"request","required":true,"dataType":"object"},
+                    id: {"in":"path","name":"id","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = new RecursoController();
+
+
+            const promise = controller.removeRecursoByID.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, undefined, next);
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

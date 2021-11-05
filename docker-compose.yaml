@@ -7,26 +7,43 @@ services:
     restart: always
     ports:
       - "5000:5000" # defining port for our app
-    # depends_on:
-    #   - keycloak
-    # networks:
-    #   - app-network
+    depends_on:
+      - keycloak
+      - mongodb
+    networks:
+      - app-network
     command: bash -c "npm run tsoa:gen; npm run build; npm run start"
     env_file: ./.env
-#   keycloak:
-#     image: jboss/keycloak:15.0.2
-#     container_name: keycloak
-#     ports:
-#       - "${KEYCLOAK_PORT}:${KEYCLOAK_PORT}"
-#     expose:
-#       - ${KEYCLOAK_PORT}
-#     environment:
-#       KEYCLOAK_PASSWORD: admin
-#       KEYCLOAK_USER: admin
-#       DB_VENDOR: h2
-#     env_file: ./.env
-#     networks:
-#       - app-network
-# networks:
-#   app-network:
-#     driver: bridge
+  keycloak:
+    image: jboss/keycloak:15.0.2
+    container_name: keycloak
+    ports:
+      - "${KEYCLOAK_PORT}:${KEYCLOAK_PORT}"
+    expose:
+      - ${KEYCLOAK_PORT}
+    environment:
+      KEYCLOAK_PASSWORD: admin
+      KEYCLOAK_USER: admin
+      DB_VENDOR: h2
+    env_file: ./.env
+    networks:
+      - app-network
+  mongodb:
+    image: mongo:5.0.2
+    restart: unless-stopped
+    env_file: ./.env
+    environment: 
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGODB_DATABASE}
+    ports:
+      - "${MONGODB_PORT}:${MONGODB_PORT}"
+    expose:
+      - "${MONGODB_PORT}"
+    volumes:
+      - db:/data/db
+networks:
+  app-network:
+    driver: bridge
+volumes:
+  db:
