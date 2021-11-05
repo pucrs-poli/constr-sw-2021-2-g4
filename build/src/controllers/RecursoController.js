@@ -27,16 +27,58 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RecursoController = void 0;
 const express_1 = __importDefault(require("express"));
 const tsoa_1 = require("tsoa");
+const RecursoModel_1 = __importDefault(require("../models/RecursoModel"));
 let RecursoController = class RecursoController extends tsoa_1.Controller {
-    getMessage() {
+    getRecurso() {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log(yield RecursoModel_1.default.RecursoModel.collection.find().toArray());
             return {
                 message: "recurso TODO",
             };
         });
     }
-    getRecurso(request, id) {
+    getRecursoByID(request, id) {
         return __awaiter(this, void 0, void 0, function* () {
+            return {
+                message: `Recurso by id to be done. ID is ${id}`,
+            };
+        });
+    }
+    createUser(request, requestBody) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { name, used, description } = request.body;
+                const newResource = {
+                    nome: name,
+                    emprestado: used,
+                    descricao: description
+                };
+                const obj = new RecursoModel_1.default.RecursoModel(newResource);
+                obj.save(err => {
+                    if (err)
+                        return "oops";
+                });
+                return {
+                    message: "New resource created",
+                    // success: true
+                };
+            }
+            catch (err) {
+                return {
+                    message: `${err.message}` //,
+                    // success: false
+                };
+            }
+        });
+    }
+    ;
+    removeRecursoByID(request, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // RecursoModel.RecursoModel.collection.deleteOne({
+            //     "_id": "618547e74505d65b12368c54"
+            // });
+            console.log(yield RecursoModel_1.default.RecursoModel.findById(id).deleteOne());
+            // findByIdAndDelete("618547e74505d65b12368c54");
             return {
                 message: `Recurso by id to be done. ID is ${id}`,
             };
@@ -48,7 +90,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], RecursoController.prototype, "getMessage", null);
+], RecursoController.prototype, "getRecurso", null);
 __decorate([
     (0, tsoa_1.Get)("/{id}"),
     __param(0, (0, tsoa_1.Request)()),
@@ -56,7 +98,23 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
-], RecursoController.prototype, "getRecurso", null);
+], RecursoController.prototype, "getRecursoByID", null);
+__decorate([
+    (0, tsoa_1.Post)("/"),
+    __param(0, (0, tsoa_1.Request)()),
+    __param(1, (0, tsoa_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], RecursoController.prototype, "createUser", null);
+__decorate([
+    (0, tsoa_1.Delete)("/{id}"),
+    __param(0, (0, tsoa_1.Request)()),
+    __param(1, (0, tsoa_1.Path)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], RecursoController.prototype, "removeRecursoByID", null);
 RecursoController = __decorate([
     (0, tsoa_1.Route)("recurso"),
     (0, tsoa_1.Path)("recurso"),

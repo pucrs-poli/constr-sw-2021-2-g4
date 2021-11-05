@@ -10,6 +10,12 @@ export const ENVIROMENT_VARIABLES = {
         HOST: process.env.KEYCLOAK_HOST,
         STANDARD_REALM: process.env.KEYCLOACK_STANDARD_REALM,
         PORT: process.env.KEYCLOAK_PORT
-
+    },
+    DATABASE: {
+        HOST: process.env.MONGODB_HOST,
+        PORT: process.env.MONGODB_PORT,
+        NAME: process.env.MONGODB_DATABASE,
+        USERNAME: process.env.MONGODB_PASSWORD,
+        PASSWORD: process.env.MONGODB_USER
     }
 }

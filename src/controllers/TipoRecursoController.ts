@@ -1,4 +1,4 @@
-import { Controller, Get, Path, Route, Tags } from "tsoa";
+import { Controller, Get, Route, Tags } from "tsoa";
 
 interface TipoRecursoResponse {
     message: string;
