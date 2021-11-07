@@ -23,13 +23,13 @@ export class TipoRecursoController extends Controller {
     ): Promise<TipoRecursoResponse | { message: string, status: boolean }> {
         try {
 
-            return {
-                console.log(await TipoRecursoModel.TipoRecursoModel.collection.find().toArray());
+            console.log(await TipoRecursoModel.TipoRecursoModel.collection.find().toArray());
+             return {
+                message: "get all resource types OK",
             };
         } catch (err: any) {
             return {
-                message: `${err.message}`,
-                success: false
+                message: `${err.message}`
             } as any;
         }
     };
@@ -43,48 +43,36 @@ export class TipoRecursoController extends Controller {
         };
     }
     @Post("/")
-    public async createUser(
+    public async createResourceType(
         @Request() request: express.Request,
-        @Body() requestBody: CreateResourceInterface
-    ): Promise<RecursoResponse> {
+        @Body() requestBody: CreateResourceTypeInterface
+    ): Promise<TipoRecursoResponse> {
         try {
-            const { name, used, description } = request.body;
-            const newResource = {
-                nome: name,
-                emprestado: used,
-                descricao: description
+            const { categoria } = request.body;
+            const newResourceType = {
+                categoria: categoria,
             }
-            const obj = new RecursoModel.RecursoModel(newResource);
+            const obj = new TipoRecursoModel.TipoRecursoModel(newResourceType);
             obj.save(err => {
-                if (err) return "oops";
+                if (err) return "Error";
             })
             return {
-                message: "New resource created",
-                // success: true
+                message: "New resource trype created",
             };
         } catch (err: any) {
             return {
-                message: `${err.message}`//,
-                // success: false
+                message: `${err.message}`
             };
         }
     };
     @Delete("/{id}")
-    public async removeRecursoByID(
+    public async deleteTipoRecursoByID(
         @Request() request: express.Request,
         @Path() id: string
-    ): Promise<RecursoResponse> {
-
-        // RecursoModel.RecursoModel.collection.deleteOne({
-        //     "_id": "618547e74505d65b12368c54"
-        // });
-
-        console.log(await RecursoModel.RecursoModel.findById(id).deleteOne());
-
-        // findByIdAndDelete("618547e74505d65b12368c54");
-
+    ): Promise<TipoRecursoResponse> {
+        console.log(await TipoRecursoModel.TipoRecursoModel.findById(id).deleteOne());
         return {
-            message: `Recurso by id to be done. ID is ${id}`,
+            message: `Resource Type deleted by id. ID deleted is ${id}`,
         };
     }
 }
