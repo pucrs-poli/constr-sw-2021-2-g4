@@ -1,5 +1,15 @@
-export class Recurso {
+import { Schema, model } from "mongoose";
 
-    _id: string;
-    categoria: string;
+const RecursoSchema = new Schema(
+    {
+        categoria: {
+            type: String,
+            required: true
+        }
+    }
+)
+
+const TipoRecursoModel = model("TipoRecurso", RecursoSchema);
+export default {
+    TipoRecursoModel
 }
