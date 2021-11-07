@@ -7,17 +7,16 @@ interface TipoRecursoResponse {
     message: string;
 }
 interface CreateResourceTypeInterface{
-    description: string
+    categoria: string
 }
 interface UpdateResourceTypeInterface{
-    description: string
+    categoria: string
 }
 
 @Route("tipoRecurso")
 @Tags("TipoRecursoController")
 export class TipoRecursoController extends Controller {
     @Get("/")
-    @Security("keycloakAuth")
     public async gelAllResourceTypes(
         @Request() request: express.Request,
     ): Promise<TipoRecursoResponse | { message: string, status: boolean }> {
@@ -38,9 +37,15 @@ export class TipoRecursoController extends Controller {
         @Request() request: express.Request,
         @Path() id: string
     ): Promise<TipoRecursoResponse> {
-        return {
-            message: `Tipo Recurso by id to be done. ID is ${id}`,
-        };
+        try {
+            return {
+                message: await TipoRecursoModel.TipoRecursoModel.findById(id)
+            };
+        } catch (err: any) {
+            return {
+                message: `${err.message}`
+            };
+        }
     }
     @Post("/")
     public async createResourceType(
@@ -75,4 +80,7 @@ export class TipoRecursoController extends Controller {
             message: `Resource Type deleted by id. ID deleted is ${id}`,
         };
     }
+    // TODO Put and getByCategory
+
+
 }
