@@ -1,6 +1,5 @@
 import express from "express";
 import { Get, Path, Route, Request, Controller, Tags, Security, Post, Body, Put, Delete, Patch } from "tsoa";
-import { keycloak } from "../config/";
 import TipoRecursoModel from '../models/TipoRecursoModel';
 
 interface TipoRecursoResponse {
@@ -77,23 +76,7 @@ export class TipoRecursoController extends Controller {
             message: `Resource Type deleted by id. ID deleted is ${id}`,
         };
     }
-    // TODO Put and getByCategory
-    @Get("/")//TODO GET BY CATEGORY
-    public async getResourceTypeByCategory(
-        @Request() request: express.Request,
-        @Path() categoria: string
-    ): Promise<TipoRecursoResponse> {
-        try {
-            return {
-                message: ''
-            };
-        } catch (err: any) {
-            return {
-                message: `${err.message}`
-            };
-        }
-    }
-    @Put("/{id}")//TODO GET BY CATEGORY
+    @Put("/{id}")
     public async updateById(
         @Request() request: express.Request,
         @Path() id: string,
@@ -108,6 +91,22 @@ export class TipoRecursoController extends Controller {
             })
             return {
                 message: "Resource Type updated",
+            };
+        } catch (err: any) {
+            return {
+                message: `${err.message}`
+            };
+        }
+    }
+    // TODO getByCategory
+    @Get("/")//TODO GET BY CATEGORY
+    public async getResourceTypeByCategory(
+        @Request() request: express.Request,
+        @Path() categoria: string
+    ): Promise<TipoRecursoResponse> {
+        try {
+            return {
+                message: ''
             };
         } catch (err: any) {
             return {
