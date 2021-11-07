@@ -1,6 +1,6 @@
 import express from "express";
 import { Mongoose } from "mongoose";
-import { Get, Path, Route, Request, Controller, Tags, Post, Body, Delete, Put } from "tsoa";
+import { Get, Path, Route, Request, Controller, Tags, Post, Body, Delete, Put, Patch } from "tsoa";
 import { RecursoModel, IRecurso } from '../models/RecursoModel';
 import { Recurso } from "../models/TipoRecursoModel";
 interface RecursoResponse {
@@ -14,9 +14,16 @@ export class RecursoController extends Controller {
     @Get("/")
     public async getRecurso(): Promise<RecursoResponse> {
         try {
-            const message = (await RecursoModel.collection.find().toArray()).toString();
+
+            let message = (await RecursoModel.collection.find().toArray());
+            let result = "";
+            if (message.length === 0)
+                result = "No resource found";
+            else
+                for (let obj in message)
+                    result += JSON.stringify(message) + "\n";
             return {
-                message,
+                message: result,
                 success: true
             };
         }
@@ -33,12 +40,12 @@ export class RecursoController extends Controller {
         @Path() id: string
     ): Promise<RecursoResponse> {
         try {
-            const result = RecursoModel.findById(id);
+            const result = (await (RecursoModel.findById(id)).exec());
             if (!result) {
                 throw 'Resource not found'
             }
             return {
-                message: `Recurso by id to be done. ID is ${id}`,
+                message: `Resource found. Resource : \n ${JSON.stringify(result)}`,
                 success: true
             };
         }
@@ -46,7 +53,7 @@ export class RecursoController extends Controller {
             return {
                 message: `${err.message}`,
                 success: false
-            } as any;
+            };
         }
     }
     @Post("/")
@@ -63,11 +70,15 @@ export class RecursoController extends Controller {
                 }
             }
             const obj = new RecursoModel(resource);
-            obj.save(err => {
-                if (err) return "oops";
-            })
+            let id = "";
+            obj.save().then((resource) => {
+                // if (err) return "oops";
+                id = resource._id
+            }).catch(
+                () => { return "oops" }
+            );
             return {
-                message: "New resource created",
+                message: `New resource created. ID : ${obj._id}`,
                 success: true
             };
         } catch (err: any) {
@@ -100,23 +111,24 @@ export class RecursoController extends Controller {
         }
     }
     @Put("/{id}")
-    public async updatePuRecursoByID(
+    public async updatePutRecursoByID(
         @Request() request: express.Request,
         @Path() id: string,
         @Body() requestBody: IRecurso
     ): Promise<RecursoResponse> {
         try {
             const recurso = requestBody;
+
             for (const value in Object.values(recurso)) {
                 if (value === undefined)
                     throw "Could not update. Contains undefined value";
             }
-            const update = RecursoModel.findByIdAndUpdate(
+            const update = await RecursoModel.findByIdAndUpdate(
                 id,
                 recurso
             );
             return {
-                message: `Resource successfully deleted.`,
+                message: `Resource successfully updated.`,
                 success: true
             };
         }
@@ -128,7 +140,7 @@ export class RecursoController extends Controller {
         }
 
     }
-    @Put("/{id}")
+    @Patch("/{id}")
     public async updatePatchRecursoByID(
         @Request() request: express.Request,
         @Path() id: string,
@@ -141,12 +153,12 @@ export class RecursoController extends Controller {
                 if (newRecurso[key] === undefined)
                     delete newRecurso[key];
             }
-            const update = RecursoModel.findByIdAndUpdate(
+            const update = await RecursoModel.findByIdAndUpdate(
                 id,
                 newRecurso
             );
             return {
-                message: `Resource successfully deleted.`,
+                message: `Resource successfully updated.`,
                 success: true
             };
         }

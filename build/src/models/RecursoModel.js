@@ -1,21 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.RecursoModel = void 0;
 const mongoose_1 = require("mongoose");
 const RecursoSchema = new mongoose_1.Schema({
-    nome: {
+    name: {
         type: String,
         required: true
     },
-    emprestado: {
+    used: {
         type: Boolean,
         required: true
     },
-    descricao: {
+    description: {
         type: String,
         required: true
     }
 });
-const RecursoModel = (0, mongoose_1.model)("Recurso", RecursoSchema);
-exports.default = {
-    RecursoModel
-};
+exports.RecursoModel = (0, mongoose_1.model)("Recurso", RecursoSchema);

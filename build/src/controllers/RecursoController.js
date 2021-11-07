@@ -27,46 +27,75 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RecursoController = void 0;
 const express_1 = __importDefault(require("express"));
 const tsoa_1 = require("tsoa");
-const RecursoModel_1 = __importDefault(require("../models/RecursoModel"));
+const RecursoModel_1 = require("../models/RecursoModel");
 let RecursoController = class RecursoController extends tsoa_1.Controller {
     getRecurso() {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(yield RecursoModel_1.default.RecursoModel.collection.find().toArray());
-            return {
-                message: "recurso TODO",
-            };
-        });
-    }
-    getRecursoByID(request, id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return {
-                message: `Recurso by id to be done. ID is ${id}`,
-            };
-        });
-    }
-    createUser(request, requestBody) {
-        return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { name, used, description } = request.body;
-                const newResource = {
-                    nome: name,
-                    emprestado: used,
-                    descricao: description
-                };
-                const obj = new RecursoModel_1.default.RecursoModel(newResource);
-                obj.save(err => {
-                    if (err)
-                        return "oops";
-                });
+                let message = (yield RecursoModel_1.RecursoModel.collection.find().toArray());
+                let result = "";
+                if (message.length === 0)
+                    result = "No resource found";
+                else
+                    for (let obj in message)
+                        result += JSON.stringify(message) + "\n";
                 return {
-                    message: "New resource created",
-                    // success: true
+                    message: result,
+                    success: true
                 };
             }
             catch (err) {
                 return {
-                    message: `${err.message}` //,
-                    // success: false
+                    message: `${err.message}`,
+                    success: false
+                };
+            }
+        });
+    }
+    getRecursoByID(request, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = (yield (RecursoModel_1.RecursoModel.findById(id)).exec());
+                if (!result) {
+                    throw 'Resource not found';
+                }
+                return {
+                    message: `Resource found. Resource : \n ${JSON.stringify(result)}`,
+                    success: true
+                };
+            }
+            catch (err) {
+                return {
+                    message: `${err.message}`,
+                    success: false
+                };
+            }
+        });
+    }
+    createResource(request, requestBody) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const resource = requestBody;
+                for (let value in Object.values(resource)) {
+                    if (value === undefined) {
+                        throw "Contains undefined value";
+                    }
+                }
+                const obj = new RecursoModel_1.RecursoModel(resource);
+                let id = "";
+                obj.save().then((resource) => {
+                    // if (err) return "oops";
+                    id = resource._id;
+                }).catch(() => { return "oops"; });
+                return {
+                    message: `New resource created. ID : ${obj._id}`,
+                    success: true
+                };
+            }
+            catch (err) {
+                return {
+                    message: `${err.message}`,
+                    success: false
                 };
             }
         });
@@ -74,14 +103,68 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
     ;
     removeRecursoByID(request, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            // RecursoModel.RecursoModel.collection.deleteOne({
-            //     "_id": "618547e74505d65b12368c54"
-            // });
-            console.log(yield RecursoModel_1.default.RecursoModel.findById(id).deleteOne());
-            // findByIdAndDelete("618547e74505d65b12368c54");
-            return {
-                message: `Recurso by id to be done. ID is ${id}`,
-            };
+            try {
+                const result = (yield RecursoModel_1.RecursoModel.findById(id).deleteOne()).ok;
+                if (result !== 1) {
+                    throw "Resource was not deleted";
+                }
+                return {
+                    message: `Resource successfully deleted.`,
+                    success: true
+                };
+            }
+            catch (err) {
+                return {
+                    message: `${err.message}`,
+                    success: false
+                };
+            }
+        });
+    }
+    updatePutRecursoByID(request, id, requestBody) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const recurso = requestBody;
+                console.log(recurso);
+                for (const value in Object.values(recurso)) {
+                    if (value === undefined)
+                        throw "Could not update. Contains undefined value";
+                }
+                const update = yield RecursoModel_1.RecursoModel.findByIdAndUpdate(id, recurso);
+                return {
+                    message: `Resource successfully updated.`,
+                    success: true
+                };
+            }
+            catch (err) {
+                return {
+                    message: `${err.message}`,
+                    success: false
+                };
+            }
+        });
+    }
+    updatePatchRecursoByID(request, id, requestBody) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const recurso = requestBody;
+                const newRecurso = recurso;
+                for (const key in newRecurso) {
+                    if (newRecurso[key] === undefined)
+                        delete newRecurso[key];
+                }
+                const update = yield RecursoModel_1.RecursoModel.findByIdAndUpdate(id, newRecurso);
+                return {
+                    message: `Resource successfully updated.`,
+                    success: true
+                };
+            }
+            catch (err) {
+                return {
+                    message: `${err.message}`,
+                    success: false
+                };
+            }
         });
     }
 };
@@ -106,7 +189,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
-], RecursoController.prototype, "createUser", null);
+], RecursoController.prototype, "createResource", null);
 __decorate([
     (0, tsoa_1.Delete)("/{id}"),
     __param(0, (0, tsoa_1.Request)()),
@@ -115,9 +198,27 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], RecursoController.prototype, "removeRecursoByID", null);
+__decorate([
+    (0, tsoa_1.Put)("/{id}"),
+    __param(0, (0, tsoa_1.Request)()),
+    __param(1, (0, tsoa_1.Path)()),
+    __param(2, (0, tsoa_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, Object]),
+    __metadata("design:returntype", Promise)
+], RecursoController.prototype, "updatePutRecursoByID", null);
+__decorate([
+    (0, tsoa_1.Patch)("/{id}"),
+    __param(0, (0, tsoa_1.Request)()),
+    __param(1, (0, tsoa_1.Path)()),
+    __param(2, (0, tsoa_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, Object]),
+    __metadata("design:returntype", Promise)
+], RecursoController.prototype, "updatePatchRecursoByID", null);
 RecursoController = __decorate([
-    (0, tsoa_1.Route)("recurso"),
-    (0, tsoa_1.Path)("recurso"),
+    (0, tsoa_1.Route)("resource"),
+    (0, tsoa_1.Path)("resource"),
     (0, tsoa_1.Tags)("RecursoController")
 ], RecursoController);
 exports.RecursoController = RecursoController;
