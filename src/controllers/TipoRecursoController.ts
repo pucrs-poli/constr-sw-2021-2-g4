@@ -6,10 +6,7 @@ import TipoRecursoModel from '../models/TipoRecursoModel';
 interface TipoRecursoResponse {
     message: string;
 }
-interface CreateResourceTypeInterface{
-    categoria: string
-}
-interface UpdateResourceTypeInterface{
+interface CreateUpdateResourceTypeInterface{
     categoria: string
 }
 
@@ -50,7 +47,7 @@ export class TipoRecursoController extends Controller {
     @Post("/")
     public async createResourceType(
         @Request() request: express.Request,
-        @Body() requestBody: CreateResourceTypeInterface
+        @Body() requestBody: CreateUpdateResourceTypeInterface
     ): Promise<TipoRecursoResponse> {
         try {
             const { categoria } = request.body;
@@ -81,6 +78,41 @@ export class TipoRecursoController extends Controller {
         };
     }
     // TODO Put and getByCategory
-
-
+    @Get("/")//TODO GET BY CATEGORY
+    public async getResourceTypeByCategory(
+        @Request() request: express.Request,
+        @Path() categoria: string
+    ): Promise<TipoRecursoResponse> {
+        try {
+            return {
+                message: ''
+            };
+        } catch (err: any) {
+            return {
+                message: `${err.message}`
+            };
+        }
+    }
+    @Put("/{id}")//TODO GET BY CATEGORY
+    public async updateById(
+        @Request() request: express.Request,
+        @Path() id: string,
+        @Body() requestBody : CreateUpdateResourceTypeInterface
+    ): Promise<TipoRecursoResponse> {
+        try {
+            const { categoria } = request.body;
+            const obj = TipoRecursoModel.TipoRecursoModel.findById(id);
+            obj.categoria = categoria;
+            obj.save(err => {
+                if (err) return "Error";
+            })
+            return {
+                message: "Resource Type updated",
+            };
+        } catch (err: any) {
+            return {
+                message: `${err.message}`
+            };
+        }
+    }
 }
