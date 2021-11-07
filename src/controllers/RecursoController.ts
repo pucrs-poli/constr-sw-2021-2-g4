@@ -1,58 +1,79 @@
 import express from "express";
-import { Get, Path, Route, Request, Controller, Tags, Post, Body, Delete } from "tsoa";
-import RecursoModel from '../models/RecursoModel';
+import { Mongoose } from "mongoose";
+import { Get, Path, Route, Request, Controller, Tags, Post, Body, Delete, Put } from "tsoa";
+import { RecursoModel, IRecurso } from '../models/RecursoModel';
+import { Recurso } from "../models/TipoRecursoModel";
 interface RecursoResponse {
-    message: string;
+    message: string,
+    success: boolean
 }
-interface CreateResourceInterface {
-    name: string,
-    used: boolean,
-    description: string
-}
-@Route("recurso")
-@Path("recurso")
+@Route("resource")
+@Path("resource")
 @Tags("RecursoController")
 export class RecursoController extends Controller {
     @Get("/")
     public async getRecurso(): Promise<RecursoResponse> {
-        console.log(await RecursoModel.RecursoModel.collection.find().toArray());
-        return {
-            message: "recurso TODO",
-        };
+        try {
+            const message = (await RecursoModel.collection.find().toArray()).toString();
+            return {
+                message,
+                success: true
+            };
+        }
+        catch (err: any) {
+            return {
+                message: `${err.message}`,
+                success: false
+            } as any;
+        }
     }
     @Get("/{id}")
     public async getRecursoByID(
         @Request() request: express.Request,
         @Path() id: string
     ): Promise<RecursoResponse> {
-        return {
-            message: `Recurso by id to be done. ID is ${id}`,
-        };
+        try {
+            const result = RecursoModel.findById(id);
+            if (!result) {
+                throw 'Resource not found'
+            }
+            return {
+                message: `Recurso by id to be done. ID is ${id}`,
+                success: true
+            };
+        }
+        catch (err: any) {
+            return {
+                message: `${err.message}`,
+                success: false
+            } as any;
+        }
     }
     @Post("/")
-    public async createUser(
+    public async createResource(
         @Request() request: express.Request,
-        @Body() requestBody: CreateResourceInterface
+        @Body() requestBody: IRecurso
     ): Promise<RecursoResponse> {
         try {
-            const { name, used, description } = request.body;
-            const newResource = {
-                nome: name,
-                emprestado: used,
-                descricao: description
+            const resource = requestBody
+            for (let value in Object.values(resource)) {
+                if (value === undefined) {
+                    throw "Contains undefined value"
+
+                }
             }
-            const obj = new RecursoModel.RecursoModel(newResource);
+            const obj = new RecursoModel(resource);
             obj.save(err => {
                 if (err) return "oops";
             })
             return {
                 message: "New resource created",
-                // success: true
+                success: true
             };
         } catch (err: any) {
             return {
-                message: `${err.message}`//,
-                // success: false
+                message: `${err.message}`,
+                success: false
             };
         }
     };
@@ -61,19 +82,81 @@ export class RecursoController extends Controller {
         @Request() request: express.Request,
         @Path() id: string
     ): Promise<RecursoResponse> {
-
-        // RecursoModel.RecursoModel.collection.deleteOne({
-        //     "_id": "618547e74505d65b12368c54"
-        // });
-
-        console.log(await RecursoModel.RecursoModel.findById(id).deleteOne());
-
-        // findByIdAndDelete("618547e74505d65b12368c54");
-
-        return {
-            message: `Recurso by id to be done. ID is ${id}`,
-        };
+        try {
+            const result = (await RecursoModel.findById(id).deleteOne()).ok;
+            if (result !== 1) {
+                throw "Resource was not deleted"
+            }
+            return {
+                message: `Resource successfully deleted.`,
+                success: true
+            };
+        }
+        catch (err: any) {
+            return {
+                message: `${err.message}`,
+                success: false
+            };
+        }
     }
+    @Put("/{id}")
+    public async updatePuRecursoByID(
+        @Request() request: express.Request,
+        @Path() id: string,
+        @Body() requestBody: IRecurso
+    ): Promise<RecursoResponse> {
+        try {
+            const recurso = requestBody;
+            for (const value in Object.values(recurso)) {
+                if (value === undefined)
+                    throw "Could not update. Contains undefined value";
+            }
+            const update = RecursoModel.findByIdAndUpdate(
+                id,
+                recurso
+            );
+            return {
+                message: `Resource successfully deleted.`,
+                success: true
+            };
+        }
+        catch (err: any) {
+            return {
+                message: `${err.message}`,
+                success: false
+            };
+        }
+
+    }
+    @Put("/{id}")
+    public async updatePatchRecursoByID(
+        @Request() request: express.Request,
+        @Path() id: string,
+        @Body() requestBody: IRecurso
+    ): Promise<RecursoResponse> {
+        try {
+            const recurso = requestBody;
+            const newRecurso = recurso as any;
+            for (const key in newRecurso) {
+                if (newRecurso[key] === undefined)
+                    delete newRecurso[key];
+            }
+            const update = RecursoModel.findByIdAndUpdate(
+                id,
+                newRecurso
+            );
+            return {
+                message: `Resource successfully deleted.`,
+                success: true
+            };
+        }
+        catch (err: any) {
+            return {
+                message: `${err.message}`,
+                success: false
+            };
+        }
+
+    }
+
 }
-
-

@@ -1,23 +1,26 @@
 import { Schema, model } from "mongoose";
 
+export interface IRecurso {
+    name: string,
+    used: boolean,
+    description: string
+}
+
 const RecursoSchema = new Schema(
     {
-        nome: {
+        name: {
             type: String,
             required: true
         },
-        emprestado: {
+        used: {
             type: Boolean,
             required: true
         },
-        descricao: {
+        description: {
             type: String,
             required: true
         }
     }
 )
 
-const RecursoModel = model("Recurso", RecursoSchema);
-export default {
-    RecursoModel
-}
+export const RecursoModel = model("Recurso", RecursoSchema);

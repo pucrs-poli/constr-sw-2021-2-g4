@@ -50,7 +50,6 @@ export class UserController extends Controller {
         @Request() request: express.Request,
     ): Promise<UserResponse | { message: string, status: boolean }> {
         try {
-
             return {
                 message: await keycloak.users.find(),
                 success: true
