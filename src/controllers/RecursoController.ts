@@ -29,7 +29,7 @@ export class RecursoController extends Controller {
         }
         catch (err: any) {
             return {
-                message: `${err.message}`,
+                message: `${err}`,
                 success: false
             } as any;
         }
@@ -37,11 +37,12 @@ export class RecursoController extends Controller {
     @Get("/{id}")
     public async getRecursoByID(
         @Request() request: express.Request,
-        @Path() id: string
+        @Path() id: string,
     ): Promise<RecursoResponse> {
         try {
             const result = (await (RecursoModel.findById(id)).exec());
-            if (!result) {
+            if (result === null) {
+                this.setStatus(404);
                 throw 'Resource not found'
             }
             return {
@@ -51,7 +52,7 @@ export class RecursoController extends Controller {
         }
         catch (err: any) {
             return {
-                message: `${err.message}`,
+                message: `${err}`,
                 success: false
             };
         }
@@ -83,7 +84,7 @@ export class RecursoController extends Controller {
             };
         } catch (err: any) {
             return {
-                message: `${err.message}`,
+                message: `${err}`,
                 success: false
             };
         }
@@ -94,8 +95,9 @@ export class RecursoController extends Controller {
         @Path() id: string
     ): Promise<RecursoResponse> {
         try {
-            const result = (await RecursoModel.findById(id).deleteOne()).ok;
-            if (result !== 1) {
+            const result = (await RecursoModel.findById(id).deleteOne());
+            if (result.deletedCount === 0) {
+                this.setStatus(404);
                 throw "Resource was not deleted"
             }
             return {
@@ -105,7 +107,7 @@ export class RecursoController extends Controller {
         }
         catch (err: any) {
             return {
-                message: `${err.message}`,
+                message: `${err}`,
                 success: false
             };
         }
@@ -118,15 +120,24 @@ export class RecursoController extends Controller {
     ): Promise<RecursoResponse> {
         try {
             const recurso = requestBody;
-
-            for (const value in Object.values(recurso)) {
-                if (value === undefined)
-                    throw "Could not update. Contains undefined value";
+            if (!recurso.name || !recurso.used || !recurso.description) {
+                this.setStatus(404);
+                throw "Could not update. Does not contains all required fields";
+            }
+            const testFieldName = Object.keys(recurso)
+                .every((element) => { return ["name", "used", "description"].includes(element) });
+            if (!testFieldName) {
+                this.setStatus(405);
+                throw "Request contains invalid field";
             }
             const update = await RecursoModel.findByIdAndUpdate(
                 id,
                 recurso
             );
+            if (update === null) {
+                this.setStatus(404);
+                throw "Could not find this object";
+            }
             return {
                 message: `Resource successfully updated.`,
                 success: true
@@ -134,7 +145,7 @@ export class RecursoController extends Controller {
         }
         catch (err: any) {
             return {
-                message: `${err.message}`,
+                message: `${err}`,
                 success: false
             };
         }
@@ -148,14 +159,16 @@ export class RecursoController extends Controller {
     ): Promise<RecursoResponse> {
         try {
             const recurso = requestBody;
-            const newRecurso = recurso as any;
-            for (const key in newRecurso) {
-                if (newRecurso[key] === undefined)
-                    delete newRecurso[key];
+
+            const testFieldName = Object.keys(recurso)
+                .every((element) => { return ["name", "used", "description"].includes(element) });
+            if (!testFieldName) {
+                this.setStatus(405);
+                throw "Request contains invalid field";
             }
             const update = await RecursoModel.findByIdAndUpdate(
                 id,
-                newRecurso
+                recurso
             );
             return {
                 message: `Resource successfully updated.`,
@@ -164,11 +177,12 @@ export class RecursoController extends Controller {
         }
         catch (err: any) {
             return {
-                message: `${err.message}`,
+                message: `${err}`,
                 success: false
             };
         }
 
-    }
 
+
+    }
 }
