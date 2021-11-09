@@ -124,7 +124,7 @@ export class TipoRecursoController extends Controller {
         }
     };
     // TODO getByCategory
-   @Get("?categoria={categoria}")//TODO GET BY CATEGORY
+   /*@Get("?categoria={categoria}")//TODO GET BY CATEGORY
     public async getResourceTypeByCategory(
         @Request() request: express.Request,
         @Path() categoria: string
@@ -139,5 +139,5 @@ export class TipoRecursoController extends Controller {
                 message: `${err.message}`
             };
         }
-    }
+    }*/
 }
