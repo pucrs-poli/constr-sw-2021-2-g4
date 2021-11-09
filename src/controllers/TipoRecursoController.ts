@@ -1,4 +1,5 @@
 import express from "express";
+import { Mongoose } from "mongoose";
 import { Get, Path, Route, Request, Controller, Tags, Security, Post, Body, Put, Delete, Patch } from "tsoa";
 import TipoRecursoModel from '../models/TipoRecursoModel';
 
@@ -19,6 +20,7 @@ export class TipoRecursoController extends Controller {
         try {
 
             console.log(await TipoRecursoModel.TipoRecursoModel.collection.find().toArray());
+            this.setStatus(200);
              return {
                 message: "get all resource types OK",
             };
@@ -34,7 +36,12 @@ export class TipoRecursoController extends Controller {
         @Path() id: string
     ): Promise<TipoRecursoResponse> {
         try {
-            console.log(await TipoRecursoModel.TipoRecursoModel.findById(id))
+            const obj = TipoRecursoModel.TipoRecursoModel.findById(id); 
+            if (obj === null) {
+                this.setStatus(404);
+                throw "Could not find this record";
+            }
+            this.setStatus(200)
             return {
                 message: "Get by id"
             };
@@ -58,6 +65,7 @@ export class TipoRecursoController extends Controller {
             obj.save(err => {
                 if (err) return "Error";
             })
+            this.setStatus(201);
             return {
                 message: "New resource trype created",
             };
@@ -72,10 +80,21 @@ export class TipoRecursoController extends Controller {
         @Request() request: express.Request,
         @Path() id: string
     ): Promise<TipoRecursoResponse> {
-        console.log(await TipoRecursoModel.TipoRecursoModel.findById(id).deleteOne());
-        return {
-            message: `Resource Type deleted by id. ID deleted is ${id}`,
-        };
+        try {
+            const obj = TipoRecursoModel.TipoRecursoModel.findById(id).deleteOne();
+            if(obj == null){
+                this.setStatus(404);
+                throw "Could not find this object to delete";
+            }
+            this.setStatus(204)
+            return {
+                message: `Resource Type deleted by id. ID deleted is ${id}`,
+            };
+        } catch (err: any) {
+            return {
+                message: `${err.message}`
+            };
+        }
     };
     @Put("/{id}")
     public async updateById(
@@ -94,6 +113,7 @@ export class TipoRecursoController extends Controller {
                 this.setStatus(404);
                 throw "Could not find this object";
             }
+            this.setStatus(200) 
             return {
                 message: "Resource Type updated",
             };
@@ -104,12 +124,13 @@ export class TipoRecursoController extends Controller {
         }
     };
     // TODO getByCategory
-   /*Get("/")//TODO GET BY CATEGORY
+   @Get("?categoria={categoria}")//TODO GET BY CATEGORY
     public async getResourceTypeByCategory(
         @Request() request: express.Request,
         @Path() categoria: string
     ): Promise<TipoRecursoResponse> {
         try {
+
             return {
                 message: ''
             };
@@ -118,5 +139,5 @@ export class TipoRecursoController extends Controller {
                 message: `${err.message}`
             };
         }
-    }*/
+    }
 }

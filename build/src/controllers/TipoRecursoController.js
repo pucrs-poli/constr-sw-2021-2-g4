@@ -87,10 +87,17 @@ let TipoRecursoController = class TipoRecursoController extends tsoa_1.Controlle
     ;
     deleteTipoRecursoByID(request, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(yield TipoRecursoModel_1.default.TipoRecursoModel.findById(id).deleteOne());
-            return {
-                message: `Resource Type deleted by id. ID deleted is ${id}`,
-            };
+            try {
+                console.log(yield TipoRecursoModel_1.default.TipoRecursoModel.findById(id).deleteOne());
+                return {
+                    message: `Resource Type deleted by id. ID deleted is ${id}`,
+                };
+            }
+            catch (err) {
+                return {
+                    message: `${err.message}`
+                };
+            }
         });
     }
     ;
