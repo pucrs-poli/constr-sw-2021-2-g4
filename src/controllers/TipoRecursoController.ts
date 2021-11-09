@@ -15,7 +15,7 @@ export class TipoRecursoController extends Controller {
     @Get("/")
     public async gelAllResourceTypes(
         @Request() request: express.Request,
-    ): Promise<TipoRecursoResponse | { message: string, status: boolean }> {
+    ): Promise<TipoRecursoResponse | { message: string}> {
         try {
 
             console.log(await TipoRecursoModel.TipoRecursoModel.collection.find().toArray());
@@ -34,15 +34,16 @@ export class TipoRecursoController extends Controller {
         @Path() id: string
     ): Promise<TipoRecursoResponse> {
         try {
+            console.log(await TipoRecursoModel.TipoRecursoModel.findById(id))
             return {
-                message: await TipoRecursoModel.TipoRecursoModel.findById(id)
+                message: "Get by id"
             };
         } catch (err: any) {
             return {
                 message: `${err.message}`
             };
         }
-    }
+    };
     @Post("/")
     public async createResourceType(
         @Request() request: express.Request,
@@ -75,7 +76,7 @@ export class TipoRecursoController extends Controller {
         return {
             message: `Resource Type deleted by id. ID deleted is ${id}`,
         };
-    }
+    };
     @Put("/{id}")
     public async updateById(
         @Request() request: express.Request,
@@ -83,12 +84,16 @@ export class TipoRecursoController extends Controller {
         @Body() requestBody : CreateUpdateResourceTypeInterface
     ): Promise<TipoRecursoResponse> {
         try {
-            const { categoria } = request.body;
-            const obj = TipoRecursoModel.TipoRecursoModel.findById(id);
-            obj.categoria = categoria;
-            obj.save(err => {
-                if (err) return "Error";
-            })
+            const tipoRecurso  = requestBody;
+            if(!tipoRecurso.categoria){
+                this.setStatus(404);
+                throw "Could not update. Does not contains all required fields";
+            }
+            const obj = TipoRecursoModel.TipoRecursoModel.findByIdAndUpdate(id,tipoRecurso);
+            if (obj === null) {
+                this.setStatus(404);
+                throw "Could not find this object";
+            }
             return {
                 message: "Resource Type updated",
             };
@@ -97,9 +102,9 @@ export class TipoRecursoController extends Controller {
                 message: `${err.message}`
             };
         }
-    }
+    };
     // TODO getByCategory
-    @Get("/")//TODO GET BY CATEGORY
+   /*Get("/")//TODO GET BY CATEGORY
     public async getResourceTypeByCategory(
         @Request() request: express.Request,
         @Path() categoria: string
@@ -113,5 +118,5 @@ export class TipoRecursoController extends Controller {
                 message: `${err.message}`
             };
         }
-    }
+    }*/
 }

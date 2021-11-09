@@ -1,6 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Recurso = void 0;
-class Recurso {
-}
-exports.Recurso = Recurso;
+const mongoose_1 = require("mongoose");
+const RecursoSchema = new mongoose_1.Schema({
+    categoria: {
+        type: String,
+        required: true
+    }
+});
+const TipoRecursoModel = (0, mongoose_1.model)("TipoRecurso", RecursoSchema);
+exports.default = {
+    TipoRecursoModel
+};
