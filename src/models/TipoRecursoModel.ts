@@ -1,5 +1,17 @@
-export class Recurso {
+import { Schema, model } from "mongoose";
 
-    _id: string;
-    categoria: string;
+export interface ITipoRecurso {
+    name?: string
 }
+
+const TipoRecursoSchema = new Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+            unique: true
+        }
+    }
+)
+
+export const TipoRecursoModel = model("TipoRecurso", TipoRecursoSchema);

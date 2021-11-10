@@ -1,9 +1,8 @@
 import express from "express";
-import { Mongoose } from "mongoose";
 import { Get, Path, Route, Request, Controller, Tags, Post, Body, Delete, Put, Patch } from "tsoa";
 import { RecursoModel, IRecurso } from '../models/RecursoModel';
-import { Recurso } from "../models/TipoRecursoModel";
 interface RecursoResponse {
+    result: any,
     message: string,
     success: boolean
 }
@@ -14,21 +13,21 @@ export class RecursoController extends Controller {
     @Get("/")
     public async getRecurso(): Promise<RecursoResponse> {
         try {
-
-            let message = (await RecursoModel.collection.find().toArray());
-            let result = "";
-            if (message.length === 0)
-                result = "No resource found";
+            let message = undefined;
+            const result = (await RecursoModel.collection.find().toArray());
+            if (result.length === 0)
+                message = "No resource found";
             else
-                for (let obj in message)
-                    result += JSON.stringify(message) + "\n";
+                message = "Found objects"
             return {
-                message: result,
+                result,
+                message,
                 success: true
             };
         }
         catch (err: any) {
             return {
+                result: null,
                 message: `${err}`,
                 success: false
             } as any;
@@ -46,12 +45,14 @@ export class RecursoController extends Controller {
                 throw 'Resource not found'
             }
             return {
-                message: `Resource found. Resource : \n ${JSON.stringify(result)}`,
+                result,
+                message: `Resource found.`,
                 success: true
             };
         }
         catch (err: any) {
             return {
+                result: null,
                 message: `${err}`,
                 success: false
             };
@@ -67,23 +68,23 @@ export class RecursoController extends Controller {
             for (let value in Object.values(resource)) {
                 if (value === undefined) {
                     throw "Contains undefined value"
-
                 }
             }
             const obj = new RecursoModel(resource);
-            let id = "";
+            let newResource = null;
             obj.save().then((resource) => {
-                // if (err) return "oops";
-                id = resource._id
+                newResource = resource
             }).catch(
                 () => { return "oops" }
             );
             return {
+                result: newResource,
                 message: `New resource created. ID : ${obj._id}`,
                 success: true
             };
         } catch (err: any) {
             return {
+                result: null,
                 message: `${err}`,
                 success: false
             };
@@ -101,12 +102,14 @@ export class RecursoController extends Controller {
                 throw "Resource was not deleted"
             }
             return {
+                result,
                 message: `Resource successfully deleted.`,
                 success: true
             };
         }
         catch (err: any) {
             return {
+                result: null,
                 message: `${err}`,
                 success: false
             };
@@ -132,19 +135,22 @@ export class RecursoController extends Controller {
             }
             const update = await RecursoModel.findByIdAndUpdate(
                 id,
-                recurso
+                recurso,
+                { new: true }
             );
             if (update === null) {
                 this.setStatus(404);
                 throw "Could not find this object";
             }
             return {
+                result: update,
                 message: `Resource successfully updated.`,
                 success: true
             };
         }
         catch (err: any) {
             return {
+                result: null,
                 message: `${err}`,
                 success: false
             };
@@ -168,21 +174,21 @@ export class RecursoController extends Controller {
             }
             const update = await RecursoModel.findByIdAndUpdate(
                 id,
-                recurso
+                recurso,
+                { new: true }
             );
             return {
+                result: update,
                 message: `Resource successfully updated.`,
                 success: true
             };
         }
         catch (err: any) {
             return {
+                result: null,
                 message: `${err}`,
                 success: false
             };
         }
-
-
-
     }
 }

@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Mongoose } from "mongoose";
 
 export interface IRecurso {
     name?: string,
@@ -19,7 +19,11 @@ const RecursoSchema = new Schema(
         description: {
             type: String,
             required: true
+        },
+        type_resource: {
+            type: Schema.Types.ObjectId, ref: 'TipoRecurso'
         }
+
     }
 )
 

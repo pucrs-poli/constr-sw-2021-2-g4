@@ -132,7 +132,7 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
                     throw "Could not update. Does not contains all required fields";
                 }
                 const testFieldName = Object.keys(recurso)
-                    .every((element) => { return element in ["name", "used", "description"]; });
+                    .every((element) => { return ["name", "used", "description"].includes(element); });
                 if (!testFieldName) {
                     this.setStatus(405);
                     throw "Request contains invalid field";

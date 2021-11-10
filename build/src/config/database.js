@@ -16,7 +16,8 @@ const connectToServer = () => {
     mongoose_1.default.connect(url, {
         user: USERNAME,
         pass: PASSWORD,
-        authSource: "admin"
+        authSource: "admin",
+        autoIndex: true
     });
 };
 exports.default = connectToServer;

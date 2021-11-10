@@ -16,8 +16,10 @@ const connectToServer = () => {
         {
             user: USERNAME,
             pass: PASSWORD,
-            authSource: "admin"
+            authSource: "admin",
+            autoIndex: true
         }
+
     )
 
 }
