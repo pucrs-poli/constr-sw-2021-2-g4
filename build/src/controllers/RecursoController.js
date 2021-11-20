@@ -32,20 +32,21 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
     getRecurso() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let message = (yield RecursoModel_1.RecursoModel.collection.find().toArray());
-                let result = "";
-                if (message.length === 0)
-                    result = "No resource found";
+                let message = undefined;
+                const result = (yield RecursoModel_1.RecursoModel.collection.find().toArray());
+                if (result.length === 0)
+                    message = "No resource found";
                 else
-                    for (let obj in message)
-                        result += JSON.stringify(message) + "\n";
+                    message = "Found objects";
                 return {
-                    message: result,
+                    result,
+                    message,
                     success: true
                 };
             }
             catch (err) {
                 return {
+                    result: null,
                     message: `${err}`,
                     success: false
                 };
@@ -61,12 +62,14 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
                     throw 'Resource not found';
                 }
                 return {
-                    message: `Resource found. Resource : \n ${JSON.stringify(result)}`,
+                    result,
+                    message: `Resource found.`,
                     success: true
                 };
             }
             catch (err) {
                 return {
+                    result: null,
                     message: `${err}`,
                     success: false
                 };
@@ -82,19 +85,30 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
                         throw "Contains undefined value";
                     }
                 }
+                if (!resource.name || !resource.used || !resource.description || !resource.type_resource) {
+                    this.setStatus(404);
+                    throw "Could not update. Does not contains all required fields";
+                }
+                const testFieldName = Object.keys(resource)
+                    .every((element) => { return ["name", "used", "description", "type_resource"].includes(element); });
+                if (!testFieldName) {
+                    this.setStatus(405);
+                    throw "Request contains invalid field";
+                }
                 const obj = new RecursoModel_1.RecursoModel(resource);
-                let id = "";
+                let newResource = null;
                 obj.save().then((resource) => {
-                    // if (err) return "oops";
-                    id = resource._id;
+                    newResource = resource;
                 }).catch(() => { return "oops"; });
                 return {
+                    result: newResource,
                     message: `New resource created. ID : ${obj._id}`,
                     success: true
                 };
             }
             catch (err) {
                 return {
+                    result: null,
                     message: `${err}`,
                     success: false
                 };
@@ -111,12 +125,14 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
                     throw "Resource was not deleted";
                 }
                 return {
+                    result,
                     message: `Resource successfully deleted.`,
                     success: true
                 };
             }
             catch (err) {
                 return {
+                    result: null,
                     message: `${err}`,
                     success: false
                 };
@@ -127,7 +143,7 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const recurso = requestBody;
-                if (!recurso.name || !recurso.used || !recurso.description) {
+                if (!recurso.name || !recurso.used || !recurso.description || !recurso.type_resource) {
                     this.setStatus(404);
                     throw "Could not update. Does not contains all required fields";
                 }
@@ -137,18 +153,20 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
                     this.setStatus(405);
                     throw "Request contains invalid field";
                 }
-                const update = yield RecursoModel_1.RecursoModel.findByIdAndUpdate(id, recurso);
+                const update = yield RecursoModel_1.RecursoModel.findByIdAndUpdate(id, recurso, { new: true });
                 if (update === null) {
                     this.setStatus(404);
                     throw "Could not find this object";
                 }
                 return {
+                    result: update,
                     message: `Resource successfully updated.`,
                     success: true
                 };
             }
             catch (err) {
                 return {
+                    result: null,
                     message: `${err}`,
                     success: false
                 };
@@ -160,19 +178,21 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
             try {
                 const recurso = requestBody;
                 const testFieldName = Object.keys(recurso)
-                    .every((element) => { return ["name", "used", "description"].includes(element); });
+                    .every((element) => { return ["name", "used", "description", "type_resource"].includes(element); });
                 if (!testFieldName) {
                     this.setStatus(405);
                     throw "Request contains invalid field";
                 }
-                const update = yield RecursoModel_1.RecursoModel.findByIdAndUpdate(id, recurso);
+                const update = yield RecursoModel_1.RecursoModel.findByIdAndUpdate(id, recurso, { new: true });
                 return {
+                    result: update,
                     message: `Resource successfully updated.`,
                     success: true
                 };
             }
             catch (err) {
                 return {
+                    result: null,
                     message: `${err}`,
                     success: false
                 };

@@ -135,21 +135,4 @@ export class TipoRecursoController extends Controller {
             };
         }
     };
-    // TODO getByCategory
-    /*@Get("?categoria={categoria}")//TODO GET BY CATEGORY
-     public async getResourceTypeByCategory(
-         @Request() request: express.Request,
-         @Path() categoria: string
-     ): Promise<TipoRecursoResponse> {
-         try {
- 
-             return {
-                 message: ''
-             };
-         } catch (err: any) {
-             return {
-                 message: `${err}`
-             };
-         }
-     }*/
 }

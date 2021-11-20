@@ -42,6 +42,7 @@ const models: TsoaRoute.Models = {
     "RecursoResponse": {
         "dataType": "refObject",
         "properties": {
+            "result": {"dataType":"any","required":true},
             "message": {"dataType":"string","required":true},
             "success": {"dataType":"boolean","required":true},
         },
@@ -54,6 +55,7 @@ const models: TsoaRoute.Models = {
             "name": {"dataType":"string"},
             "used": {"dataType":"boolean"},
             "description": {"dataType":"string"},
+            "type_resource": {"dataType":"string"},
         },
         "additionalProperties": true,
     },

@@ -51,6 +51,7 @@ const models = {
     "RecursoResponse": {
         "dataType": "refObject",
         "properties": {
+            "result": { "dataType": "any", "required": true },
             "message": { "dataType": "string", "required": true },
             "success": { "dataType": "boolean", "required": true },
         },
@@ -63,6 +64,7 @@ const models = {
             "name": { "dataType": "string" },
             "used": { "dataType": "boolean" },
             "description": { "dataType": "string" },
+            "type_resource": { "dataType": "string" },
         },
         "additionalProperties": true,
     },

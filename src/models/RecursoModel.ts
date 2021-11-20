@@ -4,6 +4,7 @@ export interface IRecurso {
     name?: string,
     used?: boolean,
     description?: string
+    type_resource?: string
 }
 
 const RecursoSchema = new Schema(

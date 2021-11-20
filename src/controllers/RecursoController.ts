@@ -70,6 +70,16 @@ export class RecursoController extends Controller {
                     throw "Contains undefined value"
                 }
             }
+            if (!resource.name || !resource.used || !resource.description || !resource.type_resource) {
+                this.setStatus(404);
+                throw "Could not update. Does not contains all required fields";
+            }
+            const testFieldName = Object.keys(resource)
+                .every((element) => { return ["name", "used", "description", "type_resource"].includes(element) });
+            if (!testFieldName) {
+                this.setStatus(405);
+                throw "Request contains invalid field";
+            }
             const obj = new RecursoModel(resource);
             let newResource = null;
             obj.save().then((resource) => {
@@ -123,7 +133,7 @@ export class RecursoController extends Controller {
     ): Promise<RecursoResponse> {
         try {
             const recurso = requestBody;
-            if (!recurso.name || !recurso.used || !recurso.description) {
+            if (!recurso.name || !recurso.used || !recurso.description || !recurso.type_resource) {
                 this.setStatus(404);
                 throw "Could not update. Does not contains all required fields";
             }
@@ -167,7 +177,7 @@ export class RecursoController extends Controller {
             const recurso = requestBody;
 
             const testFieldName = Object.keys(recurso)
-                .every((element) => { return ["name", "used", "description"].includes(element) });
+                .every((element) => { return ["name", "used", "description", "type_resource"].includes(element) });
             if (!testFieldName) {
                 this.setStatus(405);
                 throw "Request contains invalid field";
