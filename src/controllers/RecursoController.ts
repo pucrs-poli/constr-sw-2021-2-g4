@@ -1,5 +1,5 @@
 import express from "express";
-import { Get, Path, Route, Request, Controller, Tags, Post, Body, Delete, Put, Patch } from "tsoa";
+import { Get, Path, Route, Request, Controller, Tags, Post, Body, Delete, Put, Patch, Hidden } from "tsoa";
 import { RecursoModel, IRecurso } from '../models/RecursoModel';
 import { TipoRecursoModel } from "../models/TipoRecursoModel";
 import mongoose from 'mongoose';
@@ -36,6 +36,7 @@ export class RecursoController extends Controller {
         }
     }
     @Get("/query/all/")
+    @Hidden()
     public async getResourceTypeByAttribute(
         @Request() request: express.Request
     ): Promise<RecursoResponse> {

@@ -1,6 +1,6 @@
 import express from "express";
 import { Document, Mongoose } from "mongoose";
-import { Get, Path, Route, Request, Controller, Tags, Security, Post, Body, Put, Delete, Patch, Query } from "tsoa";
+import { Get, Path, Route, Request, Controller, Tags, Security, Post, Body, Put, Delete, Patch, Query, Hidden } from "tsoa";
 import { ITipoRecurso, TipoRecursoModel } from '../models/TipoRecursoModel';
 
 interface TipoRecursoResponse {
@@ -37,6 +37,7 @@ export class TipoRecursoController extends Controller {
         }
     };
     @Get("/query/all/")
+    @Hidden()
     public async getResourceTypeByAttribute(
         @Request() request: express.Request
     ): Promise<TipoRecursoResponse> {
