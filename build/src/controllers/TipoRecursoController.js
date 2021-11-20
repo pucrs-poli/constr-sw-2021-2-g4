@@ -52,6 +52,34 @@ let TipoRecursoController = class TipoRecursoController extends tsoa_1.Controlle
         });
     }
     ;
+    getResourceTypeByAttribute(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const name = request.query;
+                if (!name) {
+                    this.setStatus(405);
+                    throw "Request contains invalid field";
+                }
+                const obj = yield TipoRecursoModel_1.TipoRecursoModel.findOne({ name: request.query['name'] }).exec();
+                if (obj === null) {
+                    this.setStatus(404);
+                    throw "Could not find this record";
+                }
+                this.setStatus(200);
+                return {
+                    result: obj,
+                    message: "Get by id"
+                };
+            }
+            catch (err) {
+                return {
+                    result: null,
+                    message: `${err}`
+                };
+            }
+        });
+    }
+    ;
     getResourceTypeById(request, id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -81,6 +109,11 @@ let TipoRecursoController = class TipoRecursoController extends tsoa_1.Controlle
                 const resourceType = request.body;
                 const obj = new TipoRecursoModel_1.TipoRecursoModel(resourceType);
                 let newObj = null;
+                const containsType = yield TipoRecursoModel_1.TipoRecursoModel.findOne({ name: resourceType.name }).exec();
+                if (containsType) {
+                    this.setStatus(404);
+                    throw "Duplicated name";
+                }
                 obj.save()
                     .then(obj => { newObj = obj; })
                     .catch(err => { throw err; });
@@ -122,13 +155,51 @@ let TipoRecursoController = class TipoRecursoController extends tsoa_1.Controlle
         });
     }
     ;
-    updateById(request, id, requestBody) {
+    updateCompleteById(request, id, requestBody) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const tipoRecurso = requestBody;
                 if (!tipoRecurso.name) {
                     this.setStatus(404);
                     throw "Could not update. Does not contains all required fields";
+                }
+                const containsType = yield TipoRecursoModel_1.TipoRecursoModel.findOne({ name: tipoRecurso.name }).exec();
+                if (containsType) {
+                    this.setStatus(404);
+                    throw "Duplicated name";
+                }
+                const obj = yield TipoRecursoModel_1.TipoRecursoModel.findByIdAndUpdate(id, tipoRecurso, { new: true });
+                if (obj === null) {
+                    this.setStatus(404);
+                    throw "Could not find this object";
+                }
+                this.setStatus(200);
+                return {
+                    result: obj,
+                    message: "Resource Type updated",
+                };
+            }
+            catch (err) {
+                return {
+                    result: null,
+                    message: `${err}`
+                };
+            }
+        });
+    }
+    ;
+    updatePartialById(request, id, requestBody) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const tipoRecurso = requestBody;
+                if (!tipoRecurso.name) {
+                    this.setStatus(404);
+                    throw "Could not update. Does not contains all required fields";
+                }
+                const containsType = yield TipoRecursoModel_1.TipoRecursoModel.findOne({ name: tipoRecurso.name }).exec();
+                if (containsType) {
+                    this.setStatus(404);
+                    throw "Duplicated name";
                 }
                 const obj = yield TipoRecursoModel_1.TipoRecursoModel.findByIdAndUpdate(id, tipoRecurso, { new: true });
                 if (obj === null) {
@@ -159,8 +230,14 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TipoRecursoController.prototype, "gelAllResourceTypes", null);
 __decorate([
-    (0, tsoa_1.Get)("/{id}") //Done
-    ,
+    (0, tsoa_1.Get)("/query/all/"),
+    __param(0, (0, tsoa_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], TipoRecursoController.prototype, "getResourceTypeByAttribute", null);
+__decorate([
+    (0, tsoa_1.Get)("/{id}"),
     __param(0, (0, tsoa_1.Request)()),
     __param(1, (0, tsoa_1.Path)()),
     __metadata("design:type", Function),
@@ -191,7 +268,16 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, String, Object]),
     __metadata("design:returntype", Promise)
-], TipoRecursoController.prototype, "updateById", null);
+], TipoRecursoController.prototype, "updateCompleteById", null);
+__decorate([
+    (0, tsoa_1.Patch)("/{id}"),
+    __param(0, (0, tsoa_1.Request)()),
+    __param(1, (0, tsoa_1.Path)()),
+    __param(2, (0, tsoa_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, Object]),
+    __metadata("design:returntype", Promise)
+], TipoRecursoController.prototype, "updatePartialById", null);
 TipoRecursoController = __decorate([
     (0, tsoa_1.Route)("tipoRecurso"),
     (0, tsoa_1.Tags)("TipoRecursoController")

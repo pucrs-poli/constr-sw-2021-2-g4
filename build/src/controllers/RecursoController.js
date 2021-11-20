@@ -28,12 +28,13 @@ exports.RecursoController = void 0;
 const express_1 = __importDefault(require("express"));
 const tsoa_1 = require("tsoa");
 const RecursoModel_1 = require("../models/RecursoModel");
+const TipoRecursoModel_1 = require("../models/TipoRecursoModel");
 let RecursoController = class RecursoController extends tsoa_1.Controller {
     getRecurso() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let message = undefined;
-                const result = (yield RecursoModel_1.RecursoModel.collection.find().toArray());
+                const result = (yield RecursoModel_1.RecursoModel.find().populate("type_resource"));
                 if (result.length === 0)
                     message = "No resource found";
                 else
@@ -53,10 +54,47 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
             }
         });
     }
+    getResourceTypeByAttribute(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const name = request.query;
+                const objQuery = {};
+                for (let value in request.query) {
+                    if (["name", "used", "description", "type_resource"].includes(value)) {
+                        Object.assign(objQuery, { [value]: request.query[value] });
+                    }
+                }
+                console.log(objQuery);
+                if (!objQuery) {
+                    this.setStatus(404);
+                    throw "No query sent";
+                }
+                const obj = yield RecursoModel_1.RecursoModel.findOne(objQuery).exec();
+                if (obj === null) {
+                    this.setStatus(404);
+                    throw "Could not find this record";
+                }
+                this.setStatus(200);
+                return {
+                    result: obj,
+                    message: "Get by id",
+                    success: false
+                };
+            }
+            catch (err) {
+                return {
+                    result: null,
+                    message: `${err}`,
+                    success: false
+                };
+            }
+        });
+    }
+    ;
     getRecursoByID(request, id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = (yield (RecursoModel_1.RecursoModel.findById(id)).exec());
+                const result = (yield (RecursoModel_1.RecursoModel.findById(id).populate("type_resource")).exec());
                 if (result === null) {
                     this.setStatus(404);
                     throw 'Resource not found';
@@ -95,11 +133,16 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
                     this.setStatus(405);
                     throw "Request contains invalid field";
                 }
+                const containsType = yield TipoRecursoModel_1.TipoRecursoModel.findById(resource.type_resource).exec();
+                if (!containsType) {
+                    this.setStatus(404);
+                    throw "Does not contains resource type";
+                }
                 const obj = new RecursoModel_1.RecursoModel(resource);
                 let newResource = null;
                 obj.save().then((resource) => {
                     newResource = resource;
-                }).catch(() => { return "oops"; });
+                }).catch((err) => { console.log(err); return "oops"; });
                 return {
                     result: newResource,
                     message: `New resource created. ID : ${obj._id}`,
@@ -139,7 +182,7 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
             }
         });
     }
-    updatePutRecursoByID(request, id, requestBody) {
+    updateCompleteRecursoByID(request, id, requestBody) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const recurso = requestBody;
@@ -148,10 +191,15 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
                     throw "Could not update. Does not contains all required fields";
                 }
                 const testFieldName = Object.keys(recurso)
-                    .every((element) => { return ["name", "used", "description"].includes(element); });
+                    .every((element) => { return ["name", "used", "description", "type_resource"].includes(element); });
                 if (!testFieldName) {
                     this.setStatus(405);
                     throw "Request contains invalid field";
+                }
+                const containsType = yield TipoRecursoModel_1.TipoRecursoModel.findById(recurso.type_resource).exec();
+                if (!containsType) {
+                    this.setStatus(404);
+                    throw "Does not contains resource type";
                 }
                 const update = yield RecursoModel_1.RecursoModel.findByIdAndUpdate(id, recurso, { new: true });
                 if (update === null) {
@@ -173,7 +221,7 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
             }
         });
     }
-    updatePatchRecursoByID(request, id, requestBody) {
+    updatePartialRecursoByID(request, id, requestBody) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const recurso = requestBody;
@@ -182,6 +230,18 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
                 if (!testFieldName) {
                     this.setStatus(405);
                     throw "Request contains invalid field";
+                }
+                if (recurso.type_resource) {
+                    const containsType = yield TipoRecursoModel_1.TipoRecursoModel.findById(recurso.type_resource).exec();
+                    if (!containsType) {
+                        this.setStatus(404);
+                        throw "Does not contains resource type";
+                    }
+                }
+                const containsType = yield TipoRecursoModel_1.TipoRecursoModel.findById(recurso.type_resource).exec();
+                if (!containsType) {
+                    this.setStatus(404);
+                    throw "Does not contains resource type";
                 }
                 const update = yield RecursoModel_1.RecursoModel.findByIdAndUpdate(id, recurso, { new: true });
                 return {
@@ -206,6 +266,13 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], RecursoController.prototype, "getRecurso", null);
+__decorate([
+    (0, tsoa_1.Get)("/query/all/"),
+    __param(0, (0, tsoa_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], RecursoController.prototype, "getResourceTypeByAttribute", null);
 __decorate([
     (0, tsoa_1.Get)("/{id}"),
     __param(0, (0, tsoa_1.Request)()),
@@ -238,7 +305,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, String, Object]),
     __metadata("design:returntype", Promise)
-], RecursoController.prototype, "updatePutRecursoByID", null);
+], RecursoController.prototype, "updateCompleteRecursoByID", null);
 __decorate([
     (0, tsoa_1.Patch)("/{id}"),
     __param(0, (0, tsoa_1.Request)()),
@@ -247,7 +314,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, String, Object]),
     __metadata("design:returntype", Promise)
-], RecursoController.prototype, "updatePatchRecursoByID", null);
+], RecursoController.prototype, "updatePartialRecursoByID", null);
 RecursoController = __decorate([
     (0, tsoa_1.Route)("resource"),
     (0, tsoa_1.Path)("resource"),

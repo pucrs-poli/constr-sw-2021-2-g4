@@ -277,6 +277,23 @@ function RegisterRoutes(app) {
         promiseHandler(controller, promise, response, undefined, next);
     });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/api/v1/resource/query/all', function RecursoController_getResourceTypeByAttribute(request, response, next) {
+        const args = {
+            request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = getValidatedArgs(args, request, response);
+        }
+        catch (err) {
+            return next(err);
+        }
+        const controller = new RecursoController_1.RecursoController();
+        const promise = controller.getResourceTypeByAttribute.apply(controller, validatedArgs);
+        promiseHandler(controller, promise, response, undefined, next);
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     app.get('/api/v1/resource/:id', function RecursoController_getRecursoByID(request, response, next) {
         const args = {
             request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
@@ -331,7 +348,7 @@ function RegisterRoutes(app) {
         promiseHandler(controller, promise, response, undefined, next);
     });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    app.put('/api/v1/resource/:id', function RecursoController_updatePutRecursoByID(request, response, next) {
+    app.put('/api/v1/resource/:id', function RecursoController_updateCompleteRecursoByID(request, response, next) {
         const args = {
             request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
             id: { "in": "path", "name": "id", "required": true, "dataType": "string" },
@@ -346,11 +363,11 @@ function RegisterRoutes(app) {
             return next(err);
         }
         const controller = new RecursoController_1.RecursoController();
-        const promise = controller.updatePutRecursoByID.apply(controller, validatedArgs);
+        const promise = controller.updateCompleteRecursoByID.apply(controller, validatedArgs);
         promiseHandler(controller, promise, response, undefined, next);
     });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    app.patch('/api/v1/resource/:id', function RecursoController_updatePatchRecursoByID(request, response, next) {
+    app.patch('/api/v1/resource/:id', function RecursoController_updatePartialRecursoByID(request, response, next) {
         const args = {
             request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
             id: { "in": "path", "name": "id", "required": true, "dataType": "string" },
@@ -365,7 +382,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
         const controller = new RecursoController_1.RecursoController();
-        const promise = controller.updatePatchRecursoByID.apply(controller, validatedArgs);
+        const promise = controller.updatePartialRecursoByID.apply(controller, validatedArgs);
         promiseHandler(controller, promise, response, undefined, next);
     });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -383,6 +400,23 @@ function RegisterRoutes(app) {
         }
         const controller = new TipoRecursoController_1.TipoRecursoController();
         const promise = controller.gelAllResourceTypes.apply(controller, validatedArgs);
+        promiseHandler(controller, promise, response, undefined, next);
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/api/v1/tipoRecurso/query/all', function TipoRecursoController_getResourceTypeByAttribute(request, response, next) {
+        const args = {
+            request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = getValidatedArgs(args, request, response);
+        }
+        catch (err) {
+            return next(err);
+        }
+        const controller = new TipoRecursoController_1.TipoRecursoController();
+        const promise = controller.getResourceTypeByAttribute.apply(controller, validatedArgs);
         promiseHandler(controller, promise, response, undefined, next);
     });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -440,7 +474,7 @@ function RegisterRoutes(app) {
         promiseHandler(controller, promise, response, undefined, next);
     });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    app.put('/api/v1/tipoRecurso/:id', function TipoRecursoController_updateById(request, response, next) {
+    app.put('/api/v1/tipoRecurso/:id', function TipoRecursoController_updateCompleteById(request, response, next) {
         const args = {
             request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
             id: { "in": "path", "name": "id", "required": true, "dataType": "string" },
@@ -455,7 +489,26 @@ function RegisterRoutes(app) {
             return next(err);
         }
         const controller = new TipoRecursoController_1.TipoRecursoController();
-        const promise = controller.updateById.apply(controller, validatedArgs);
+        const promise = controller.updateCompleteById.apply(controller, validatedArgs);
+        promiseHandler(controller, promise, response, undefined, next);
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.patch('/api/v1/tipoRecurso/:id', function TipoRecursoController_updatePartialById(request, response, next) {
+        const args = {
+            request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+            id: { "in": "path", "name": "id", "required": true, "dataType": "string" },
+            requestBody: { "in": "body", "name": "requestBody", "required": true, "ref": "CreateUpdateResourceTypeInterface" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = getValidatedArgs(args, request, response);
+        }
+        catch (err) {
+            return next(err);
+        }
+        const controller = new TipoRecursoController_1.TipoRecursoController();
+        const promise = controller.updatePartialById.apply(controller, validatedArgs);
         promiseHandler(controller, promise, response, undefined, next);
     });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

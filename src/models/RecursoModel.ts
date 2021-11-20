@@ -1,5 +1,4 @@
 import { Schema, model, Mongoose } from "mongoose";
-
 export interface IRecurso {
     name?: string,
     used?: boolean,

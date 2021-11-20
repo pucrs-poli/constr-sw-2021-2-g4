@@ -1,6 +1,8 @@
 import express from "express";
 import { Get, Path, Route, Request, Controller, Tags, Post, Body, Delete, Put, Patch } from "tsoa";
 import { RecursoModel, IRecurso } from '../models/RecursoModel';
+import { TipoRecursoModel } from "../models/TipoRecursoModel";
+import mongoose from 'mongoose';
 interface RecursoResponse {
     result: any,
     message: string,
@@ -14,7 +16,7 @@ export class RecursoController extends Controller {
     public async getRecurso(): Promise<RecursoResponse> {
         try {
             let message = undefined;
-            const result = (await RecursoModel.collection.find().toArray());
+            const result = (await RecursoModel.find().populate("type_resource"));
             if (result.length === 0)
                 message = "No resource found";
             else
@@ -33,13 +35,49 @@ export class RecursoController extends Controller {
             } as any;
         }
     }
+    @Get("/query/all/")
+    public async getResourceTypeByAttribute(
+        @Request() request: express.Request
+    ): Promise<RecursoResponse> {
+        try {
+            const name = request.query
+            const objQuery = {}
+            for (let value in request.query) {
+                if (["name", "used", "description", "type_resource"].includes(value)) {
+                    Object.assign(objQuery, { [value]: request.query[value] })
+                }
+            }
+            console.log(objQuery)
+            if (!objQuery) {
+                this.setStatus(404)
+                throw "No query sent";
+            }
+            const obj = await RecursoModel.findOne(objQuery).exec();
+            if (obj === null) {
+                this.setStatus(404);
+                throw "Could not find this record";
+            }
+            this.setStatus(200)
+            return {
+                result: obj,
+                message: "Get by id",
+                success: false
+            };
+        } catch (err: any) {
+            return {
+                result: null,
+                message: `${err}`,
+                success: false
+            };
+        }
+    };
     @Get("/{id}")
     public async getRecursoByID(
         @Request() request: express.Request,
         @Path() id: string,
     ): Promise<RecursoResponse> {
         try {
-            const result = (await (RecursoModel.findById(id)).exec());
+            const result = (await (RecursoModel.findById(id).populate("type_resource")).exec());
             if (result === null) {
                 this.setStatus(404);
                 throw 'Resource not found'
@@ -80,12 +118,17 @@ export class RecursoController extends Controller {
                 this.setStatus(405);
                 throw "Request contains invalid field";
             }
+            const containsType = await TipoRecursoModel.findById(resource.type_resource).exec();
+            if (!containsType) {
+                this.setStatus(404);
+                throw "Does not contains resource type";
+            }
             const obj = new RecursoModel(resource);
             let newResource = null;
             obj.save().then((resource) => {
                 newResource = resource
             }).catch(
-                () => { return "oops" }
+                (err) => { console.log(err); return "oops" }
             );
             return {
                 result: newResource,
@@ -126,7 +169,7 @@ export class RecursoController extends Controller {
         }
     }
     @Put("/{id}")
-    public async updatePutRecursoByID(
+    public async updateCompleteRecursoByID(
         @Request() request: express.Request,
         @Path() id: string,
         @Body() requestBody: IRecurso
@@ -138,10 +181,15 @@ export class RecursoController extends Controller {
                 throw "Could not update. Does not contains all required fields";
             }
             const testFieldName = Object.keys(recurso)
-                .every((element) => { return ["name", "used", "description"].includes(element) });
+                .every((element) => { return ["name", "used", "description", "type_resource"].includes(element) });
             if (!testFieldName) {
                 this.setStatus(405);
                 throw "Request contains invalid field";
+            }
+            const containsType = await TipoRecursoModel.findById(recurso.type_resource).exec();
+            if (!containsType) {
+                this.setStatus(404);
+                throw "Does not contains resource type";
             }
             const update = await RecursoModel.findByIdAndUpdate(
                 id,
@@ -168,7 +216,7 @@ export class RecursoController extends Controller {
 
     }
     @Patch("/{id}")
-    public async updatePatchRecursoByID(
+    public async updatePartialRecursoByID(
         @Request() request: express.Request,
         @Path() id: string,
         @Body() requestBody: IRecurso
@@ -181,6 +229,18 @@ export class RecursoController extends Controller {
             if (!testFieldName) {
                 this.setStatus(405);
                 throw "Request contains invalid field";
+            }
+            if (recurso.type_resource) {
+                const containsType = await TipoRecursoModel.findById(recurso.type_resource).exec();
+                if (!containsType) {
+                    this.setStatus(404);
+                    throw "Does not contains resource type";
+                }
+            }
+            const containsType = await TipoRecursoModel.findById(recurso.type_resource).exec();
+            if (!containsType) {
+                this.setStatus(404);
+                throw "Does not contains resource type";
             }
             const update = await RecursoModel.findByIdAndUpdate(
                 id,
