@@ -64,7 +64,6 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
                         Object.assign(objQuery, { [value]: request.query[value] });
                     }
                 }
-                console.log(objQuery);
                 if (!objQuery) {
                     this.setStatus(404);
                     throw "No query sent";
@@ -123,7 +122,7 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
                         throw "Contains undefined value";
                     }
                 }
-                if (!resource.name || !resource.used || !resource.description || !resource.type_resource) {
+                if (!resource.name || !resource.hasOwnProperty('used') || !resource.description || !resource.type_resource) {
                     this.setStatus(404);
                     throw "Could not update. Does not contains all required fields";
                 }

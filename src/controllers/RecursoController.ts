@@ -48,7 +48,6 @@ export class RecursoController extends Controller {
                     Object.assign(objQuery, { [value]: request.query[value] })
                 }
             }
-            console.log(objQuery)
             if (!objQuery) {
                 this.setStatus(404)
                 throw "No query sent";
@@ -109,7 +108,8 @@ export class RecursoController extends Controller {
                     throw "Contains undefined value"
                 }
             }
-            if (!resource.name || !resource.used || !resource.description || !resource.type_resource) {
+
+            if (!resource.name || !resource.hasOwnProperty('used') || !resource.description || !resource.type_resource) {
                 this.setStatus(404);
                 throw "Could not update. Does not contains all required fields";
             }
@@ -177,7 +177,7 @@ export class RecursoController extends Controller {
     ): Promise<RecursoResponse> {
         try {
             const recurso = requestBody;
-            if (!recurso.name || !recurso.used || !recurso.description || !recurso.type_resource) {
+            if (!recurso.name || !recurso.hasOwnProperty('used') || !recurso.description || !recurso.type_resource) {
                 this.setStatus(404);
                 throw "Could not update. Does not contains all required fields";
             }
