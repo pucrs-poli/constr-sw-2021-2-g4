@@ -237,11 +237,6 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
                         throw "Does not contains resource type";
                     }
                 }
-                const containsType = yield TipoRecursoModel_1.TipoRecursoModel.findById(recurso.type_resource).exec();
-                if (!containsType) {
-                    this.setStatus(404);
-                    throw "Does not contains resource type";
-                }
                 const update = yield RecursoModel_1.RecursoModel.findByIdAndUpdate(id, recurso, { new: true });
                 return {
                     result: update,

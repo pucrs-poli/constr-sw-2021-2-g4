@@ -238,11 +238,6 @@ export class RecursoController extends Controller {
                     throw "Does not contains resource type";
                 }
             }
-            const containsType = await TipoRecursoModel.findById(recurso.type_resource).exec();
-            if (!containsType) {
-                this.setStatus(404);
-                throw "Does not contains resource type";
-            }
             const update = await RecursoModel.findByIdAndUpdate(
                 id,
                 recurso,
