@@ -231,6 +231,7 @@ __decorate([
 ], TipoRecursoController.prototype, "gelAllResourceTypes", null);
 __decorate([
     (0, tsoa_1.Get)("/query/all/"),
+    (0, tsoa_1.Hidden)(),
     __param(0, (0, tsoa_1.Request)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
