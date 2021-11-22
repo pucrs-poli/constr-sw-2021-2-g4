@@ -27,6 +27,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TipoRecursoController = void 0;
 const express_1 = __importDefault(require("express"));
 const tsoa_1 = require("tsoa");
+const RecursoModel_1 = require("../models/RecursoModel");
 const TipoRecursoModel_1 = require("../models/TipoRecursoModel");
 let TipoRecursoController = class TipoRecursoController extends tsoa_1.Controller {
     gelAllResourceTypes(request) {
@@ -140,6 +141,7 @@ let TipoRecursoController = class TipoRecursoController extends tsoa_1.Controlle
                     this.setStatus(404);
                     throw "Resource Type was not deleted";
                 }
+                yield RecursoModel_1.RecursoModel.deleteMany({ 'type_resource': id });
                 this.setStatus(204);
                 return {
                     result: obj,

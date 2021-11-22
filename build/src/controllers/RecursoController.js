@@ -185,7 +185,7 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const recurso = requestBody;
-                if (!recurso.name || !recurso.used || !recurso.description || !recurso.type_resource) {
+                if (!recurso.name || !recurso.hasOwnProperty('used') || !recurso.description || !recurso.type_resource) {
                     this.setStatus(404);
                     throw "Could not update. Does not contains all required fields";
                 }

@@ -1,12 +1,10 @@
 import mongoose from 'mongoose';
 import { ENVIROMENT_VARIABLES } from "./enviroment"
 
-const { HOST, NAME, PORT, USERNAME, PASSWORD } = ENVIROMENT_VARIABLES.DATABASE
+const { USERNAME, PASSWORD, URL } = ENVIROMENT_VARIABLES.DATABASE
 
+const url = `${URL}`
 
-// const url = `mongodb://${HOST}:${PORT}/${NAME}`;
-const url = `mongodb+srv://admin:admin@cluster0.egmvu.mongodb.net/MYDATA?retryWrites=true&w=majority`
-// const url = `mongodb://${HOST}:${PORT}`;
 mongoose.connection.on('error', function (err) {
     console.log("fuck bro not working")
 });

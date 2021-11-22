@@ -1,6 +1,7 @@
 import express from "express";
 import { Document, Mongoose } from "mongoose";
 import { Get, Path, Route, Request, Controller, Tags, Security, Post, Body, Put, Delete, Patch, Query, Hidden } from "tsoa";
+import { RecursoModel } from "../models/RecursoModel";
 import { ITipoRecurso, TipoRecursoModel } from '../models/TipoRecursoModel';
 
 interface TipoRecursoResponse {
@@ -14,6 +15,7 @@ interface CreateUpdateResourceTypeInterface {
 @Route("tipoRecurso")
 @Tags("TipoRecursoController")
 export class TipoRecursoController extends Controller {
+
     @Get("/")
     public async gelAllResourceTypes(
         @Request() request: express.Request,
@@ -128,6 +130,7 @@ export class TipoRecursoController extends Controller {
                 this.setStatus(404);
                 throw "Resource Type was not deleted"
             }
+            await RecursoModel.deleteMany({ 'type_resource': id })
             this.setStatus(204)
             return {
                 result: obj,

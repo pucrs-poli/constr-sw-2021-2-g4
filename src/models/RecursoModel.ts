@@ -26,5 +26,4 @@ const RecursoSchema = new Schema(
 
     }
 )
-
 export const RecursoModel = model("Recurso", RecursoSchema);
