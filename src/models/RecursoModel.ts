@@ -1,4 +1,5 @@
-import { Schema, model, Mongoose } from "mongoose";
+import { Schema, model } from "mongoose";
+import { ReservaModel } from "./ReservaModel";
 export interface IRecurso {
     name?: string,
     used?: boolean,

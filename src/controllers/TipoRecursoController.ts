@@ -89,7 +89,6 @@ export class TipoRecursoController extends Controller {
             };
         }
     };
-
     @Post("/")
     public async createResourceType(
         @Request() request: express.Request,
@@ -211,4 +210,5 @@ export class TipoRecursoController extends Controller {
             };
         }
     };
+
 }

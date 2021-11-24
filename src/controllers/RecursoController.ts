@@ -2,11 +2,17 @@ import express from "express";
 import { Get, Path, Route, Request, Controller, Tags, Post, Body, Delete, Put, Patch, Hidden } from "tsoa";
 import { RecursoModel, IRecurso } from '../models/RecursoModel';
 import { TipoRecursoModel } from "../models/TipoRecursoModel";
+import { IReserva, ReservaModel } from '../models/ReservaModel';
 import mongoose from 'mongoose';
 interface RecursoResponse {
     result: any,
     message: string,
     success: boolean
+}
+interface IRecursoFree {
+    name?: string,
+    resourceTypeName?: string,
+    timestamp: Date[]
 }
 @Route("resource")
 @Path("resource")
@@ -96,6 +102,92 @@ export class RecursoController extends Controller {
             };
         }
     }
+    @Get("/query/free/")
+    public async getFreeResource(
+        @Request() request: express.Request,
+    ): Promise<RecursoResponse> {
+        try {
+            const { name, resourceTypeName } = request.query
+            const { startTime, endTime } = request.query;
+            if (typeof startTime !== 'string')
+                throw "startTime is a must field"
+            if (typeof endTime !== 'string')
+                throw "endTime is a must field"
+            const timestamp = [new Date(startTime), new Date(endTime)]
+            if (timestamp[0]?.toString() === 'Invalid Date' || timestamp[1]?.toString() === 'Invalid Date') {
+                this.setStatus(405);
+                throw "Request must contains valid date. Check value and format (Should be 2021-11-23T22:35:33.881Z, no quotes)";
+            }
+            if ((!name && !resourceTypeName) || (name && resourceTypeName)) {
+                this.setStatus(405);
+                throw "Request must contains either recourse name or type recourse name";
+            }
+            if (!timestamp) {
+                this.setStatus(405);
+                throw "Request must contains the timestamp field";
+            }
+            if (timestamp.length !== 2) {
+                this.setStatus(405);
+                throw "Timestamp must contains two values";
+            }
+            if (!timestamp[0] || !timestamp[1]) {
+                this.setStatus(400)
+                throw `\nCheck values [${timestamp}]. The first and second element must be a date`
+            }
+            if (timestamp[0] >= timestamp[1]) {
+                this.setStatus(400);
+                throw `\nCheck values [${timestamp}]. The first should be smaller than the second`
+            }
+            let resourcesID: any
+            if (name) {
+                resourcesID = (await RecursoModel.find({ name }).exec());
+                console.log(resourcesID);
+            }
+            else {
+                const typeRec = (await TipoRecursoModel.find({ name: resourceTypeName }).select("resource").exec());
+                if (!typeRec) {
+                    this.setStatus(404)
+                    throw "Resource type not found";
+                }
+                resourcesID = (await RecursoModel.find().where('type_resource').equals(typeRec).exec());
+            }
+
+            const obj = (await ReservaModel.find().where('resource').in(resourcesID).populate('resource').exec());
+            const suitableResources: any[] = [];
+
+            resourcesID.forEach((el: any) => {
+                const exists = obj.find((rec) => el._id.equals(rec.get("resource")._id))
+
+                if (!exists)
+                    suitableResources.push(el);
+            })
+
+            for (let resource of obj) {
+                const allReservation = resource.get("reserva") as Date[][]
+                const notOverlap = allReservation.every((dates) => {
+                    return dates[1] <= timestamp[0] || dates[0] >= timestamp[1]
+                })
+                if (notOverlap) suitableResources.push(resource);
+            }
+            if (!suitableResources.length) {
+                this.setStatus(404)
+                throw "No suitable resources found"
+            }
+
+            this.setStatus(200)
+            return {
+                result: suitableResources,
+                message: "Resources suitables for this timestamp",
+                success: true
+            };
+        } catch (err: any) {
+            return {
+                result: null,
+                message: `${err}`,
+                success: false
+            };
+        }
+    };
     @Post("/")
     public async createResource(
         @Request() request: express.Request,
@@ -214,7 +306,6 @@ export class RecursoController extends Controller {
                 success: false
             };
         }
-
     }
     @Patch("/{id}")
     public async updatePartialRecursoByID(
@@ -248,6 +339,147 @@ export class RecursoController extends Controller {
                 message: `Resource successfully updated.`,
                 success: true
             };
+        }
+        catch (err: any) {
+            return {
+                result: null,
+                message: `${err}`,
+                success: false
+            };
+        }
+    }
+    @Post("/reserve")
+    public async reserveResource(
+        @Request() request: express.Request,
+        @Body() requestBody: IReserva
+
+    ): Promise<RecursoResponse> {
+        try {
+            let finalMessage = "";
+            const recurso = requestBody;
+
+            const date = recurso.reserva
+
+            if (!date[0] || !date[1]) {
+                this.setStatus(400)
+                throw `\nCheck values [${date}]. The first and second element must be a date`
+            }
+            if (date[0] >= date[1]) {
+                this.setStatus(400);
+                throw `\nCheck values [${date}]. The first should be smaller than the second`
+            }
+            const obj = (await ReservaModel.findOne(
+                {
+                    "resource": recurso.resource_id,
+                    "id_user": recurso.user_id
+                }
+            ).exec())
+            if (obj) {
+                const allReservation = obj.get("reserva") as Date[][];
+                const notOverlap = allReservation.every((dates) => {
+                    return dates[1] <= date[0] || dates[0] >= date[1]
+                })
+                if (notOverlap) {
+                    await ReservaModel.findByIdAndUpdate(
+                        obj._id,
+                        { $push: { reserva: date } },
+                        { new: true }
+                    );
+                }
+                else {
+                    this.setStatus(400);
+                    throw `\nvalues [${date}] overlaps.`
+                }
+                return {
+                    result: finalMessage,
+                    message: `Resource successfully reserved.`,
+                    success: true
+                };
+            }
+            else {
+                const obj = new ReservaModel({ id_user: recurso.user_id, resource: recurso.resource_id, reserva: recurso.reserva });
+                let newResource = null;
+                obj.save().then((resource) => {
+                    newResource = resource
+                }).catch(
+                    (err) => { console.log(err); return "oops" }
+                );
+                return {
+                    result: newResource,
+                    message: `Resource successfully reserved.`,
+                    success: true
+                };
+            }
+        }
+        catch (err: any) {
+            return {
+                result: null,
+                message: `${err}`,
+                success: false
+            };
+        }
+    }
+    @Post("/unreserve")
+    public async unreserveResource(
+        @Body() requestBody: IReserva
+
+    ): Promise<RecursoResponse> {
+        try {
+            let finalMessage = "";
+            const recurso = requestBody;
+            const obj = (await ReservaModel.findOne(
+                {
+                    "resource": recurso.resource_id,
+                    "id_user": recurso.user_id
+                }
+            ).exec())
+            if (obj) {
+                let originalReservation = obj.get("reserva") as Date[][];
+                if (originalReservation.length) {
+                    let element = recurso.reserva
+                    const index = originalReservation.findIndex((date) => {
+                        return (date[0].getTime() === element[0].getTime() && date[1].getTime() === element[1].getTime())
+                    })
+                    if (index) {
+
+                        originalReservation = originalReservation.splice(index, 1);
+
+                        const a = await ReservaModel.findByIdAndUpdate(
+                            obj._id,
+                            {
+                                reserva: originalReservation
+                            },
+                            { new: true }
+                        );
+
+                        return {
+                            result: null,
+                            message: `Deleted reservation.`,
+                            success: false
+                        };
+                    }
+                    else
+                        return {
+                            result: null,
+                            message: `Reservation not found.`,
+                            success: false
+                        };
+                }
+                else {
+                    return {
+                        result: null,
+                        message: `No reservation for this resource.`,
+                        success: false
+                    };
+                }
+            }
+            else {
+                return {
+                    result: null,
+                    message: `No reservation for this resource.`,
+                    success: false
+                };
+            }
         }
         catch (err: any) {
             return {

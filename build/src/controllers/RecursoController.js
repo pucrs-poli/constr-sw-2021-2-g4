@@ -29,6 +29,7 @@ const express_1 = __importDefault(require("express"));
 const tsoa_1 = require("tsoa");
 const RecursoModel_1 = require("../models/RecursoModel");
 const TipoRecursoModel_1 = require("../models/TipoRecursoModel");
+const ReservaModel_1 = require("../models/ReservaModel");
 let RecursoController = class RecursoController extends tsoa_1.Controller {
     getRecurso() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -113,6 +114,90 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
             }
         });
     }
+    getFreeResource(request) {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { name, resourceTypeName } = request.query;
+                const { startTime, endTime } = request.query;
+                if (typeof startTime !== 'string')
+                    throw "startTime is a must field";
+                if (typeof endTime !== 'string')
+                    throw "endTime is a must field";
+                const timestamp = [new Date(startTime), new Date(endTime)];
+                if (((_a = timestamp[0]) === null || _a === void 0 ? void 0 : _a.toString()) === 'Invalid Date' || ((_b = timestamp[1]) === null || _b === void 0 ? void 0 : _b.toString()) === 'Invalid Date') {
+                    this.setStatus(405);
+                    throw "Request must contains valid date. Check value and format (Should be 2021-11-23T22:35:33.881Z, no quotes)";
+                }
+                if ((!name && !resourceTypeName) || (name && resourceTypeName)) {
+                    this.setStatus(405);
+                    throw "Request must contains either recourse name or type recourse name";
+                }
+                if (!timestamp) {
+                    this.setStatus(405);
+                    throw "Request must contains the timestamp field";
+                }
+                if (timestamp.length !== 2) {
+                    this.setStatus(405);
+                    throw "Timestamp must contains two values";
+                }
+                if (!timestamp[0] || !timestamp[1]) {
+                    this.setStatus(400);
+                    throw `\nCheck values [${timestamp}]. The first and second element must be a date`;
+                }
+                if (timestamp[0] >= timestamp[1]) {
+                    this.setStatus(400);
+                    throw `\nCheck values [${timestamp}]. The first should be smaller than the second`;
+                }
+                let resourcesID;
+                if (name) {
+                    resourcesID = (yield RecursoModel_1.RecursoModel.find({ name }).exec());
+                    console.log(resourcesID);
+                }
+                else {
+                    const typeRec = (yield TipoRecursoModel_1.TipoRecursoModel.find({ name: resourceTypeName }).select("resource").exec());
+                    if (!typeRec) {
+                        this.setStatus(404);
+                        throw "Resource type not found";
+                    }
+                    resourcesID = (yield RecursoModel_1.RecursoModel.find().where('type_resource').equals(typeRec).exec());
+                }
+                const obj = (yield ReservaModel_1.ReservaModel.find().where('resource').in(resourcesID).populate('resource').exec());
+                const suitableResources = [];
+                resourcesID.forEach((el) => {
+                    const exists = obj.find((rec) => el._id.equals(rec.get("resource")._id));
+                    if (!exists)
+                        suitableResources.push(el);
+                });
+                for (let resource of obj) {
+                    const allReservation = resource.get("reserva");
+                    const notOverlap = allReservation.every((dates) => {
+                        return dates[1] <= timestamp[0] || dates[0] >= timestamp[1];
+                    });
+                    if (notOverlap)
+                        suitableResources.push(resource);
+                }
+                if (!suitableResources.length) {
+                    this.setStatus(404);
+                    throw "No suitable resources found";
+                }
+                this.setStatus(200);
+                return {
+                    result: suitableResources,
+                    message: "Resources suitables for this timestamp",
+                    success: true
+                };
+            }
+            catch (err) {
+                return {
+                    result: null,
+                    message: `${err}`,
+                    success: false
+                };
+            }
+        });
+    }
+    ;
     createResource(request, requestBody) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -253,6 +338,123 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
             }
         });
     }
+    reserveResource(request, requestBody) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let finalMessage = "";
+                const recurso = requestBody;
+                const date = recurso.reserva;
+                if (!date[0] || !date[1]) {
+                    this.setStatus(400);
+                    throw `\nCheck values [${date}]. The first and second element must be a date`;
+                }
+                if (date[0] >= date[1]) {
+                    this.setStatus(400);
+                    throw `\nCheck values [${date}]. The first should be smaller than the second`;
+                }
+                const obj = (yield ReservaModel_1.ReservaModel.findOne({
+                    "resource": recurso.resource_id,
+                    "id_user": recurso.user_id
+                }).exec());
+                if (obj) {
+                    const allReservation = obj.get("reserva");
+                    const notOverlap = allReservation.every((dates) => {
+                        return dates[1] <= date[0] || dates[0] >= date[1];
+                    });
+                    if (notOverlap) {
+                        yield ReservaModel_1.ReservaModel.findByIdAndUpdate(obj._id, { $push: { reserva: date } }, { new: true });
+                    }
+                    else {
+                        this.setStatus(400);
+                        throw `\nvalues [${date}] overlaps.`;
+                    }
+                    return {
+                        result: finalMessage,
+                        message: `Resource successfully reserved.`,
+                        success: true
+                    };
+                }
+                else {
+                    const obj = new ReservaModel_1.ReservaModel({ id_user: recurso.user_id, resource: recurso.resource_id, reserva: recurso.reserva });
+                    let newResource = null;
+                    obj.save().then((resource) => {
+                        newResource = resource;
+                    }).catch((err) => { console.log(err); return "oops"; });
+                    return {
+                        result: newResource,
+                        message: `Resource successfully reserved.`,
+                        success: true
+                    };
+                }
+            }
+            catch (err) {
+                return {
+                    result: null,
+                    message: `${err}`,
+                    success: false
+                };
+            }
+        });
+    }
+    unreserveResource(requestBody) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let finalMessage = "";
+                const recurso = requestBody;
+                const obj = (yield ReservaModel_1.ReservaModel.findOne({
+                    "resource": recurso.resource_id,
+                    "id_user": recurso.user_id
+                }).exec());
+                if (obj) {
+                    let originalReservation = obj.get("reserva");
+                    if (originalReservation.length) {
+                        let element = recurso.reserva;
+                        const index = originalReservation.findIndex((date) => {
+                            return (date[0].getTime() === element[0].getTime() && date[1].getTime() === element[1].getTime());
+                        });
+                        if (index) {
+                            originalReservation = originalReservation.splice(index, 1);
+                            const a = yield ReservaModel_1.ReservaModel.findByIdAndUpdate(obj._id, {
+                                reserva: originalReservation
+                            }, { new: true });
+                            return {
+                                result: null,
+                                message: `Deleted reservation.`,
+                                success: false
+                            };
+                        }
+                        else
+                            return {
+                                result: null,
+                                message: `Reservation not found.`,
+                                success: false
+                            };
+                    }
+                    else {
+                        return {
+                            result: null,
+                            message: `No reservation for this resource.`,
+                            success: false
+                        };
+                    }
+                }
+                else {
+                    return {
+                        result: null,
+                        message: `No reservation for this resource.`,
+                        success: false
+                    };
+                }
+            }
+            catch (err) {
+                return {
+                    result: null,
+                    message: `${err}`,
+                    success: false
+                };
+            }
+        });
+    }
 };
 __decorate([
     (0, tsoa_1.Get)("/"),
@@ -276,6 +478,13 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], RecursoController.prototype, "getRecursoByID", null);
+__decorate([
+    (0, tsoa_1.Get)("/query/free/"),
+    __param(0, (0, tsoa_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], RecursoController.prototype, "getFreeResource", null);
 __decorate([
     (0, tsoa_1.Post)("/"),
     __param(0, (0, tsoa_1.Request)()),
@@ -310,6 +519,21 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, Object]),
     __metadata("design:returntype", Promise)
 ], RecursoController.prototype, "updatePartialRecursoByID", null);
+__decorate([
+    (0, tsoa_1.Post)("/reserve"),
+    __param(0, (0, tsoa_1.Request)()),
+    __param(1, (0, tsoa_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], RecursoController.prototype, "reserveResource", null);
+__decorate([
+    (0, tsoa_1.Post)("/unreserve"),
+    __param(0, (0, tsoa_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], RecursoController.prototype, "unreserveResource", null);
 RecursoController = __decorate([
     (0, tsoa_1.Route)("resource"),
     (0, tsoa_1.Path)("resource"),

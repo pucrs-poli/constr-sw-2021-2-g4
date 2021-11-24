@@ -31,7 +31,6 @@ export class AuthController extends Controller {
                 throw new Error("No user found");
             }
             const { refreshToken, accessToken } = request.user
-
             if (refreshToken && accessToken)
                 return {
                     message: `Successfully authenticated!`,

@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose";
-import { RecursoModel } from "./RecursoModel";
 
 export interface ITipoRecurso {
     name?: string
