@@ -338,6 +338,30 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
             }
         });
     }
+    deleteReservasRecursoByUser(request, body) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_user, id_resource } = body;
+                // console.log(await ReservaModel.find().exec());
+                const update = yield ReservaModel_1.ReservaModel.findOneAndDelete({
+                    id_user,
+                    resource: id_resource
+                });
+                return {
+                    result: null,
+                    message: `Clear all reservation. User ID ${id_user}. Resource ID ${id_resource}`,
+                    success: true
+                };
+            }
+            catch (err) {
+                return {
+                    result: null,
+                    message: `${err}`,
+                    success: false
+                };
+            }
+        });
+    }
     reserveResource(request, requestBody) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -480,6 +504,7 @@ __decorate([
 ], RecursoController.prototype, "getRecursoByID", null);
 __decorate([
     (0, tsoa_1.Get)("/query/free/"),
+    (0, tsoa_1.Hidden)(),
     __param(0, (0, tsoa_1.Request)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -519,6 +544,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, Object]),
     __metadata("design:returntype", Promise)
 ], RecursoController.prototype, "updatePartialRecursoByID", null);
+__decorate([
+    (0, tsoa_1.Patch)("/reservation/clear"),
+    __param(0, (0, tsoa_1.Request)()),
+    __param(1, (0, tsoa_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], RecursoController.prototype, "deleteReservasRecursoByUser", null);
 __decorate([
     (0, tsoa_1.Post)("/reserve"),
     __param(0, (0, tsoa_1.Request)()),

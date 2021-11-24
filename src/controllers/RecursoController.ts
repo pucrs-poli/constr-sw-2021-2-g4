@@ -14,6 +14,10 @@ interface IRecursoFree {
     resourceTypeName?: string,
     timestamp: Date[]
 }
+interface IRecursoUserClear {
+    id_resource: string,
+    id_user: string
+}
 @Route("resource")
 @Path("resource")
 @Tags("RecursoController")
@@ -103,6 +107,7 @@ export class RecursoController extends Controller {
         }
     }
     @Get("/query/free/")
+    @Hidden()
     public async getFreeResource(
         @Request() request: express.Request,
     ): Promise<RecursoResponse> {
@@ -348,6 +353,33 @@ export class RecursoController extends Controller {
             };
         }
     }
+    @Patch("/reservation/clear")
+    public async deleteReservasRecursoByUser(
+        @Request() request: express.Request,
+        @Body() body: IRecursoUserClear,
+    ): Promise<RecursoResponse> {
+        try {
+            const { id_user, id_resource } = body;
+            const update = await ReservaModel.findOneAndDelete(
+                {
+                    id_user,
+                    resource: id_resource
+                }
+            );
+            return {
+                result: null,
+                message: `Clear all reservation. User ID: ${id_user}. Resource ID: ${id_resource}`,
+                success: true
+            };
+        }
+        catch (err: any) {
+            return {
+                result: null,
+                message: `${err}`,
+                success: false
+            };
+        }
+    }
     @Post("/reserve")
     public async reserveResource(
         @Request() request: express.Request,
@@ -489,4 +521,5 @@ export class RecursoController extends Controller {
             };
         }
     }
+
 }
