@@ -1,23 +1,30 @@
 import { Schema, model } from "mongoose";
+import { ReservaModel } from "./ReservaModel";
+export interface IRecurso {
+    name?: string,
+    used?: boolean,
+    description?: string
+    type_resource?: string
+}
 
 const RecursoSchema = new Schema(
     {
-        nome: {
+        name: {
             type: String,
             required: true
         },
-        emprestado: {
+        used: {
             type: Boolean,
             required: true
         },
-        descricao: {
+        description: {
             type: String,
             required: true
+        },
+        type_resource: {
+            type: Schema.Types.ObjectId, ref: 'TipoRecurso'
         }
+
     }
 )
-
-const RecursoModel = model("Recurso", RecursoSchema);
-export default {
-    RecursoModel
-}
+export const RecursoModel = model("Recurso", RecursoSchema);

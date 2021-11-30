@@ -10,11 +10,9 @@ export async function expressAuthentication(
     if (securityName === "keycloakLogin") {
 
         const { username, password, grantType, clientId } = request.body;
-        console.log(request.body)
         await keycloak.auth({
             username, password, grantType, clientId
         })
-
         if (!keycloak.accessToken || !keycloak.refreshToken)
             return Promise.reject(new Error("No token found."));
         const { refreshToken, accessToken } = keycloak
