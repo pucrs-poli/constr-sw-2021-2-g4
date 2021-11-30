@@ -342,14 +342,13 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_user, id_resource } = body;
-                // console.log(await ReservaModel.find().exec());
                 const update = yield ReservaModel_1.ReservaModel.findOneAndDelete({
                     id_user,
                     resource: id_resource
                 });
                 return {
                     result: null,
-                    message: `Clear all reservation. User ID ${id_user}. Resource ID ${id_resource}`,
+                    message: `Clear all reservation. User ID: ${id_user}. Resource ID: ${id_resource}`,
                     success: true
                 };
             }
