@@ -26,7 +26,19 @@ export class RecursoController extends Controller {
     public async getRecurso(): Promise<RecursoResponse> {
         try {
             let message = undefined;
-            const result = (await RecursoModel.find().populate("type_resource"));
+            const result = (await RecursoModel.find().populate("type_resource")).map((el) => el.toObject());
+
+            const result_reservation = (await ReservaModel.find());
+            const result2 = result.forEach((el, index, array) => {
+                const el_id = el._id;
+                const index_reservation = result_reservation.filter((obj) => {
+                    return obj.get("resource").equals(el_id);
+                }
+                )
+                array[index] = Object.assign(array[index], { "reservation": index_reservation })
+                console.log({ "reservation": index_reservation })
+                console.log(array[index])
+            })
             if (result.length === 0)
                 message = "No resource found";
             else

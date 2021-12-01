@@ -35,7 +35,17 @@ let RecursoController = class RecursoController extends tsoa_1.Controller {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let message = undefined;
-                const result = (yield RecursoModel_1.RecursoModel.find().populate("type_resource"));
+                const result = (yield RecursoModel_1.RecursoModel.find().populate("type_resource")).map((el) => el.toObject());
+                const result_reservation = (yield ReservaModel_1.ReservaModel.find());
+                const result2 = result.forEach((el, index, array) => {
+                    const el_id = el._id;
+                    const index_reservation = result_reservation.filter((obj) => {
+                        return obj.get("resource").equals(el_id);
+                    });
+                    array[index] = Object.assign(array[index], { "reservation": index_reservation });
+                    console.log({ "reservation": index_reservation });
+                    console.log(array[index]);
+                });
                 if (result.length === 0)
                     message = "No resource found";
                 else
